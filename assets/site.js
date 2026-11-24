@@ -49,12 +49,20 @@
   $('latestGrid').innerHTML=list.slice(0,6).map(card).join('')||'<div class="empty-results">Admin मधून बातम्या प्रकाशित झाल्यावर येथे दिसतील.</div>';
   $('districtGrid').innerHTML=(settings.districts||district).map(x=>'<a href="'+ROOT+'?q='+encodeURIComponent(x)+'">'+esc(x)+' →</a>').join('');
   const sectionCats=['राजकारण','शेती','विकास','शिक्षण','नोकरी','पर्यटन'].filter(cat=>list.some(p=>p.category===cat));
-  const compactRow=(p,fallback)=>'<a class="topic-row" href="'+storyUrl(p)+'">'+cover(p)+'<span><strong>'+esc(p.title)+'</strong>'+(fallback?'<small>'+esc(p.category||'बातमी')+'</small>':'')+'</span></a>';
+  // Use unique real stories to demonstrate the three-card layout while a section is short.
+  // Supplementary stories are explicitly labeled with their actual category.
+  const reserved=new Set(sectionCats.flatMap(cat=>list.filter(p=>p.category===cat).slice(0,3).map(p=>p.slug)));
+  const supplemental=list.filter(p=>!reserved.has(p.slug));
+  const used=new Set();
+  const compactRow=(p,fallback)=>'<a class="topic-row" href="'+storyUrl(p)+'" title="'+esc(p.title)+'">'+cover(p)+'<span><strong>'+esc(p.title)+'</strong>'+(fallback?'<small class="topic-demo-label">इतर बातमी · '+esc(p.category||'बातमी')+'</small>':'')+'</span></a>';
+  const placeholder=()=>'<div class="topic-row topic-demo-empty"><span class="thumb" aria-hidden="true"><span class="placeholder">+</span></span><span><strong>नवीन बातमीसाठी जागा</strong><small>Demo · लवकरच</small></span></div>';
   const sectionHTML=cat=>{
-   const relevant=list.filter(p=>p.category===cat||(cat==='विशेष बातम्या'&&p.featured));
+   const relevant=list.filter(p=>p.category===cat);
    const chosen=relevant.slice(0,3);
+   for(const p of supplemental){if(chosen.length>=3)break;if(used.has(p.slug)||chosen.some(x=>x.slug===p.slug))continue;chosen.push(p);used.add(p.slug);}
    const more=ROOT+'?category='+encodeURIComponent(cat);
-   return '<section class="topic-panel"><div class="topic-heading"><h3>'+esc(cat)+'</h3><span class="heading-line"></span><a class="view-more" href="'+more+'">View More →</a></div><div class="topic-stories">'+(chosen.length?chosen.map((p,i)=>i===0?'<a class="topic-main" href="'+storyUrl(p)+'">'+cover(p)+'<strong>'+esc(p.title)+'</strong>'+(relevant.includes(p)?'':'<small>इतर महत्त्वाच्या बातम्या</small>')+'</a>':compactRow(p,!relevant.includes(p))).join(''):'<p>या विभागातील बातम्या लवकरच.</p>')+'</div></section>';
+   const rows=chosen.map((p,i)=>i===0?'<a class="topic-main" href="'+storyUrl(p)+'" title="'+esc(p.title)+'">'+cover(p)+'<strong>'+esc(p.title)+'</strong>'+'</a>':compactRow(p,p.category!==cat)).join('')+Array.from({length:Math.max(0,3-chosen.length)},placeholder).join('');
+   return '<section class="topic-panel"><div class="topic-heading"><h3>'+esc(cat)+'</h3><span class="heading-line"></span><a class="view-more" href="'+more+'">View More →</a></div><div class="topic-stories">'+rows+'</div></section>';
   };
   const band=$('categoryBand');
   band.dataset.count=String(sectionCats.length);
