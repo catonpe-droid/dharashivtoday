@@ -49,12 +49,11 @@
   $('specialList').innerHTML=specialStories.map(x=>'<a class="special-card" href="'+storyUrl(x)+'"><div class="special-story-copy"><span class="tag">'+esc(x.category||'विशेष')+'</span><h3>'+esc(x.title)+'</h3></div>'+cover(x)+'</a>').join('')||'<div class="brief-empty">विशेष बातम्या येथे प्रसिद्ध होतील.</div>';
   $('latestGrid').innerHTML=list.slice(0,6).map(card).join('')||'<div class="empty-results">Admin मधून बातम्या प्रकाशित झाल्यावर येथे दिसतील.</div>';
   $('districtGrid').innerHTML=(settings.districts||district).map(x=>'<a href="'+ROOT+'?q='+encodeURIComponent(x)+'">'+esc(x)+' →</a>').join('');
-  const sectionCats=['राजकारण','शेती','विकास','शिक्षण','नोकरी','पर्यटन','क्रीडा','मनोरंजन'];
+  const sectionCats=['राजकारण','शेती','विकास','शिक्षण','नोकरी','पर्यटन'].filter(cat=>list.some(p=>p.category===cat));
   const compactRow=(p,fallback)=>'<a class="topic-row" href="'+storyUrl(p)+'">'+cover(p)+'<span><strong>'+esc(p.title)+'</strong>'+(fallback?'<small>'+esc(p.category||'बातमी')+'</small>':'')+'</span></a>';
   const sectionHTML=cat=>{
    const relevant=list.filter(p=>p.category===cat||(cat==='विशेष बातम्या'&&p.featured));
-   const fallback=list.filter(p=>!relevant.some(r=>r.slug===p.slug));
-   const chosen=[...relevant,...fallback].slice(0,3);
+   const chosen=relevant.slice(0,3);
    const more=ROOT+'?category='+encodeURIComponent(cat);
    return '<section class="topic-panel"><div class="topic-heading"><h3>'+esc(cat)+'</h3><span class="heading-line"></span><a class="view-more" href="'+more+'">View More →</a></div><div class="topic-stories">'+(chosen.length?chosen.map((p,i)=>i===0?'<a class="topic-main" href="'+storyUrl(p)+'">'+cover(p)+'<strong>'+esc(p.title)+'</strong>'+(relevant.includes(p)?'':'<small>इतर महत्त्वाच्या बातम्या</small>')+'</a>':compactRow(p,!relevant.includes(p))).join(''):'<p>या विभागातील बातम्या लवकरच.</p>')+'</div></section>';
   };
@@ -100,7 +99,7 @@
   document.title=(p.seoTitle||p.title)+' | धाराशिव टुडे';
   const body=Array.isArray(p.body)?p.body.join('\n\n'):String(p.body||'');
   const html=p.bodyHtml?cleanHtml(p.bodyHtml):body.split(/\n\s*\n/).filter(Boolean).map(par=>'<p>'+esc(par).replace(/\n/g,'<br>')+'</p>').join('');
-  const shareUrl=location.href;
+  const shareUrl=new URL(storyUrl(p),location.origin).href;
   const shareTitle=p.title+' | धाराशिव टुडे';
   const shareStrip='<div class="social-share" aria-label="बातमी शेअर करा">'
    +'<div class="share-label">'+iconSvg('share')+' <span>ही बातमी शेअर करा</span></div>'

@@ -21,7 +21,8 @@ for(const p of list){
  const url=site+'batmi/'+slug+'/';const title=(p.seoTitle||p.title)+' | धाराशिव टुडे',desc=p.seoDescription||p.summary||'धाराशिव टुडे';
  const img=/^https:\/\/dharashivlive\.com\/wp-content\/uploads\/[^"'<>?]+\.(?:jpg|jpeg|webp|png)$/i.test(p.image||'')?p.image:(/^assets\/uploads\/[a-z0-9_.-]+\.(?:jpg|jpeg|webp|png)$/i.test(p.image||'')?site+p.image:site+'assets/logo-original-hd.png');
  let h=source.replace('data-story=""','data-story="'+slug+'"').replace(/<title>[^<]*<\/title>/,()=>'<title>'+safe(title)+'</title>').replace(/<meta name="description" content="[^"]*">/,()=>'<meta name="description" content="'+safe(desc)+'">');
- for(const [key,value] of [['og:title',title],['og:description',desc],['og:image',img],['og:type','article'],['og:url',url]])h=meta(h,key,value);
+ for(const [key,value] of [['og:title',title],['og:description',desc],['og:image',img],['og:type','article'],['og:url',url],['og:site_name','Dharashiv Today'],['og:locale','mr_IN'],['og:image:secure_url',img],['og:image:alt',p.title]])h=meta(h,key,value);
+ for(const [name,value] of [['twitter:title',title],['twitter:description',desc],['twitter:image',img],['twitter:image:alt',p.title]]){const tag='<meta name="'+name+'" content="'+safe(value)+'">';const re=new RegExp('<meta name="'+name+'" content="[^"]*">');h=re.test(h)?h.replace(re,()=>tag):h.replace('</head>',()=>tag+'</head>');}
  const ld={'@context':'https://schema.org','@type':'NewsArticle',headline:p.title,description:desc,image:[img],datePublished:p.date,mainEntityOfPage:url,author:{'@type':'Person',name:p.author||'धाराशिव टुडे न्यूज डेस्क'},publisher:{'@type':'Organization',name:'धाराशिव टुडे',url:site}};
  h=h.replace('</head>',()=>'<link rel="canonical" href="'+safe(url)+'"><script type="application/ld+json">'+JSON.stringify(ld).replace(/</g,'\\u003c')+'</script></head>');
  write('batmi/'+slug+'/index.html',h);urls.push(url);

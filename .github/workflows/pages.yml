@@ -27,6 +27,13 @@ jobs:
         run: node scripts/build.mjs
         env:
           PAGES_URL: ${{ steps.pages.outputs.base_url }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install share-image support
+        run: python -m pip install --disable-pip-version-check pillow
+      - name: Generate same-host social previews
+        run: python scripts/share_images.py
       - uses: actions/upload-pages-artifact@v4
         with:
           path: site
