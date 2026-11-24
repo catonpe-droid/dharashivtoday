@@ -131,7 +131,7 @@
    +'<div class="article-meta">'+iconSvg('share')+' <span>'+esc(dateFmt(p.date))+'</span> <span class="article-meta-dot">•</span> <span>'+esc(p.author||'धाराशिव टुडे न्यूज डेस्क')+'</span></div>'
    +(p.summary?'<p class="article-intro">'+esc(p.summary)+'</p>':'')
    +(image(p,true)?'<figure class="article-figure"><img src="'+esc(image(p,true))+'" alt="'+esc(p.title)+'" decoding="async"><figcaption>छायाचित्र : '+esc(p.imageCredit||p.source||'धाराशिव टुडे')+'</figcaption></figure>':'')
-   +shareStrip+'<div class="article-body">'+html+'</div>'
+   +'<div class="article-body">'+html+'</div>'
    +(p.sourceUrl&&/^https:\/\/dharashivlive\.com\//.test(p.sourceUrl)?'<div class="source-credit">स्रोत : <a href="'+esc(p.sourceUrl)+'" target="_blank" rel="noopener noreferrer">धाराशिव लाईव्ह — मूळ बातमी</a> · '+esc(dateFmt(p.date))+'</div>':'')
    +'<div class="article-after"><span>ही बातमी उपयोगी वाटली? आपल्या मित्रांपर्यंत पोहोचवा.</span>'+shareStrip+'</div>'
    +'<a class="back-to-home" href="'+ROOT+'">'+iconSvg('home')+' मुख्यपृष्ठावर परत जा</a></article>';
