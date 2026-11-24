@@ -1,0 +1,4 @@
+{
+  "worker_url": "",
+  "note": "Dharashiv Today has an independent newsroom. The private Cloudflare publishing Worker is not configured. Use a scoped GitHub token in the admin to publish; never commit tokens."
+}

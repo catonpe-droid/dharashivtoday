@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="mr"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#171717"><title>धाराशिव टुडे | News Admin Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet"><link href="./admin.css?v=10" rel="stylesheet"></head><body class="admin-locked">
+<section class="admin-login-overlay" id="admin-login-overlay" role="dialog" aria-modal="true" aria-labelledby="admin-login-title">
+  <div class="admin-login-card">
+    <div class="admin-login-logo"><span>धाराशिव</span> टुडे</div>
+    <div class="admin-login-caption">NEWS ADMIN STUDIO</div>
+    <h1 id="admin-login-title">Admin Login</h1>
+    <p class="admin-login-description">बातमी व्यवस्थापन सुरू करण्यासाठी लॉगिन करा.</p>
+    <form id="admin-login-form" autocomplete="off">
+      <label for="admin-login-username">Username</label>
+      <input id="admin-login-username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Username" required>
+      <label for="admin-login-password">Password</label>
+      <input id="admin-login-password" name="password" type="password" autocomplete="current-password" placeholder="Password" required>
+      <p id="admin-login-feedback" class="admin-login-feedback" role="alert" aria-live="polite"></p>
+      <button type="submit">Login <span aria-hidden="true">→</span></button>
+    </form>
+    <a class="admin-login-home" href="../">← मुख्य वेबसाइटवर जा</a>
+  </div>
+</section>
+<header class="top"><a class="brand" href="../"><strong>धाराशिव <span>टुडे</span></strong><small>NEWS ADMIN STUDIO</small></a>
+<div class="top-actions"><button id="admin-change-password" type="button" class="btn" title="Admin Login पासवर्ड बदला">🔑 Change Password</button><a class="btn" href="../" target="_blank" rel="noopener">🌐 Website</a><button id="refresh" type="button" class="btn">↻ Refresh</button><button id="new-top" type="button" class="btn primary">+ नवीन बातमी</button></div></header>
+<aside class="admin-navigation" aria-label="Admin sections">
+<div class="admin-nav-brand"><span>DN</span><div><strong>DHARASHIV TODAY</strong><small>EDITORIAL DESK</small></div></div>
+<div class="admin-nav-caption">CONTENT MANAGEMENT</div>
+<button class="tab" data-target="dashboard-panel" type="button">▦ <span>Dashboard</span></button>
+<button class="tab active" data-target="news-panel" type="button">▤ <span>All News & Editor</span></button>
+<button class="tab" data-target="media-panel" type="button">▧ <span>Media Library</span></button>
+<div class="admin-nav-caption">WEBSITE CONTROL</div>
+<button class="tab" data-target="layout-panel" type="button">⚙ <span>Appearance & Layout</span></button>
+<a class="admin-nav-link" href="../" target="_blank" rel="noopener">↗ <span>Website Preview</span></a>
+<div class="admin-nav-foot">काळा • लाल • पिवळा<br><span>Independent News CMS</span></div>
+</aside>
+<main class="wrap">
+<div class="heading"><div><h1>बातमी व्यवस्थापन</h1><p>बातम्या, मसुदे, फोटो, Custom URL आणि वेबसाइटचा लेआउट.</p></div><div class="notice" id="status" role="status" aria-live="polite">प्रकाशन जोडणी आवश्यक आहे.</div></div>
+
+<section class="card connect admin-onboarding">
+ <div><b>🔐 स्वतंत्र Server Publishing</b><p>धाराशिव टुडेच्या स्वतंत्र फोल्डरमधील बातम्या प्रकाशित करण्यासाठी GitHub Repository Contents: Read and write परवानगी असलेला Token जोडा. Token सार्वजनिकपणे शेअर करू नका.</p></div>
+ <div class="connect-fields"><input id="token" type="password" spellcheck="false" autocomplete="off" placeholder="Paste Server Publishing Access Token"><button id="connect" type="button" class="btn primary">Connect</button><button id="disconnect" type="button" class="btn">Disconnect</button></div>
+</section>
+
+<nav class="tabs" aria-label="Studio shortcuts">
+<button class="tab" data-target="dashboard-panel" type="button">▦ Dashboard</button>
+<button class="tab active" data-target="news-panel" type="button">📰 News Studio</button>
+<button class="tab" data-target="media-panel" type="button">▧ Media Library</button>
+<button class="tab" data-target="layout-panel" type="button">⚙️ Layout Settings</button>
+</nav>
+<section id="dashboard-panel" class="card pro-panel hidden">
+<div class="panel-head"><h2>▦ संपादकीय Dashboard</h2><button id="dashboard-refresh" class="btn mini" type="button">↻ Refresh</button></div>
+<div class="panel-body">
+<div class="stat-grid">
+<div class="stat"><span>एकूण बातम्या</span><strong id="metric-total">—</strong><small>Repository मधील entries</small></div>
+<div class="stat"><span>प्रकाशित</span><strong id="metric-published">—</strong><small>वेबसाइटवर दिसणाऱ्या</small></div>
+<div class="stat"><span>मसुदे</span><strong id="metric-draft">—</strong><small>Public repository मध्ये डेटा दिसू शकतो</small></div>
+<div class="stat"><span>Featured</span><strong id="metric-featured">—</strong><small>मुख्य बातम्या</small></div>
+</div><div class="dashboard-grid"><div><h3>नवीनतम बातम्या</h3><div id="dashboard-recent" class="dashboard-recent"></div></div>
+<div><h3>Quick Actions</h3><p>लेख, प्रतिमा, रंगसंगती, मेनू आणि होमपेज विभाग व्यवस्थापित करा.</p>
+<div class="quick-actions"><button type="button" class="btn primary" data-jump="news-panel">+ नवीन बातमी</button><button class="btn" type="button" data-jump="media-panel">फोटो व्यवस्थापन</button><button class="btn" type="button" data-jump="layout-panel">Site Customize</button></div></div></div>
+</div></section>
+<section class="workspace" id="news-panel">
+ <aside class="card listing">
+  <div class="panel-head"><h2>सर्व बातम्या</h2><span class="counter" id="total">0</span></div>
+  <div class="panel-body"><input type="search" id="search" placeholder="शीर्षक / विभाग / Slug शोधा">
+   <div class="filters"><button type="button" class="filter active" data-status="all">सर्व</button><button type="button" class="filter" data-status="published">Published</button><button type="button" class="filter" data-status="draft">Draft</button></div>
+   <div class="check-row"><label><input id="select-all" type="checkbox"> दिसणाऱ्या सर्व निवडा</label><button id="clear-selected" type="button" class="btn mini">Clear</button></div>
+   <div id="post-list" class="post-list"></div>
+   <div class="bulk-actions"><span id="selected-count">0 selected</span><button type="button" id="bulk-delete" class="btn danger" disabled>🗑 Bulk Delete</button></div>
+  </div>
+ </aside>
+ <section class="card editor">
+  <div class="panel-head"><h2 id="editor-title">📰 नवीन बातमी</h2><button id="new" type="button" class="btn mini">+ नवीन</button></div>
+  <form id="post-form" class="panel-body">
+   <label class="field">बातमीचे शीर्षक *<input id="title" maxlength="180" minlength="8" required placeholder="अचूक बातमीचा मथळा"></label>
+   
+   <div class="columns"><label class="field">विभाग *<select id="category" required></select></label><label class="field">बातमीदार / लेखक<input id="author" maxlength="100" placeholder="धाराशिव टुडे न्यूज डेस्क"></label></div>
+   <label class="field">बातमीचा सारांश (SEO / WhatsApp) *<textarea id="summary" rows="3" maxlength="500" required></textarea></label>
+   <div class="field rich-field"><div class="editor-label-row"><label for="body">संपूर्ण बातमी <span class="required">*</span></label><span class="editor-mode" id="editor-mode">Rich Text Editor</span></div>
+<div id="rich-toolbar"><select class="ql-header" aria-label="Heading level"><option selected></option><option value="2">Heading</option><option value="3">Subheading</option></select>
+<button type="button" class="ql-bold" aria-label="Bold"></button><button type="button" class="ql-italic" aria-label="Italic"></button>
+<button type="button" class="ql-underline" aria-label="Underline"></button><button type="button" class="ql-strike" aria-label="Strikethrough"></button>
+<button type="button" class="ql-list" value="ordered" aria-label="Numbered list"></button><button type="button" class="ql-list" value="bullet" aria-label="Bullet list"></button>
+<button type="button" class="ql-blockquote" aria-label="Quote"></button><button type="button" class="ql-link" aria-label="Link"></button>
+<button type="button" class="ql-clean" aria-label="Clear formatting"></button></div>
+<div id="rich-editor" aria-label="बातमी लेखन"></div>
+<textarea id="body" rows="15" required class="plain-editor hidden" placeholder="बातमी लिहा. रिकामी ओळ म्हणजे नवीन परिच्छेद; ## मथळा म्हणजे उपशीर्षक."></textarea>
+<div class="rich-status"><span id="word-count">0 शब्द</span><div><button id="insert-photo" class="btn mini" type="button">📷 फोटो घाला</button><button id="toggle-editor" class="btn mini" type="button">HTML / Text</button></div></div>
+<small>Bold, Italic, मथळे, सूची, Blockquote, Links आणि फोटो. HTML सुरक्षित करून प्रकाशित केला जाईल.</small></div>
+   <div class="columns"><label class="field">मुख्य फोटो / Thumbnail<input id="photo" type="file" accept="image/jpeg,image/png,image/webp"><button type="button" id="choose-cover" class="btn mini">▧ Media Library मधून निवडा</button><small>1200×630 JPG; आधीचा फोटो बदलायचा नसेल तर रिकामे ठेवा.</small></label><label class="field">बातमीतले फोटो (कमाल 4)<input id="gallery" type="file" accept="image/jpeg,image/png,image/webp" multiple><small>नवीन gallery निवडल्यास जुनी gallery बदलेल.</small></label></div>
+   <img class="cover-preview hidden" id="cover-preview" alt="मुख्य फोटोचे पूर्वावलोकन">
+   <div class="columns"><label class="field">वाचन वेळ (मिनिटे)<input id="minutes" type="number" min="1" max="30" value="3"></label>
+<label class="field">बातमीचा प्रकार<select id="type"><option>बातमी</option><option>संपादकीय बातमी</option><option>विशेष लेख</option><option>संपादकीय लेख</option><option>मार्गदर्शक</option><option>मुलाखत</option><option>तपास अहवाल</option></select></label></div>
+   <div class="columns"><label class="field">मूळ स्रोत<input id="source" maxlength="120"></label><label class="field">मूळ स्रोत लिंक<input id="source-url" type="url" placeholder="https://example.com"></label></div>
+   <details class="seo-card"><summary>📈 Search Engine Optimization (SEO)</summary>
+<div class="columns"><label class="field">SEO Title<input id="seo-title" maxlength="150" placeholder="Google साठी स्वतंत्र शीर्षक"></label><label class="field">SEO Keywords<input id="seo-keywords" maxlength="220" placeholder="keyword1, keyword2"></label></div>
+<label class="field">SEO Description<textarea id="seo-description" rows="3" maxlength="350" placeholder="शोध परिणाम आणि शेअरिंगसाठी सारांश"></textarea></label>
+<div class="seo-preview"><small>Google preview</small><strong id="seo-preview-title">धाराशिव टुडे</strong><span id="seo-preview-url">https://catonpe-droid.github.io/dharashivtoday/</span><p id="seo-preview-desc">बातमीचा सारांश येथे दिसेल.</p></div>
+</details>
+   <div class="actions"><button id="preview" type="button" class="btn">👁 Preview</button><button id="draft" type="button" class="btn">📝 Save Draft</button><button id="publish" type="submit" class="btn primary">✅ Publish / Update</button><button id="delete" type="button" class="btn danger">🗑 Delete</button></div>
+   <div id="result" class="saved hidden"></div>
+  </form>
+ </section>
+ <aside class="card notes"><div class="panel-head"><h2>⚙️ प्रकाशन सेटिंग्ज</h2></div><div class="panel-body">
+<label class="field">बातमीची सध्याची स्थिती<select id="post-status" form="post-form"><option value="published">Published — प्रकाशित</option><option value="draft">Draft — मसुदा</option></select></label>
+<p class="aside-hint">मसुद्यासाठी “Save Draft” आणि प्रकाशित करण्यासाठी “Publish / Update” वापरा.</p>
+<label class="checkbox-field"><input id="featured" form="post-form" type="checkbox"> मुख्य बातमी (Featured)</label>
+<label class="field">Tags / Keywords<input id="tags" form="post-form" placeholder="राजकारण, जनहित, मराठवाडा"><small>स्वल्पविरामाने वेगळे करा.</small></label>
+<label class="field">YouTube व्हिडिओ URL<input id="video" form="post-form" type="url" placeholder="https://www.youtube.com/watch?v=..."></label>
+<label class="field">बातमी URL (Slug) *<input id="slug" form="post-form" maxlength="100" minlength="3" required spellcheck="false" placeholder="news-short-title"><small>इंग्रजी लहान अक्षरे / अंक / hyphen. हा URL तुमच्या नियंत्रणात आहे.</small></label>
+<label class="field">Published Date<input id="date" form="post-form" type="date"></label>
+<hr><a id="current-url" href="../" target="_blank" rel="noopener">बातमीची Live Link</a><button id="copy-link" class="btn mini" type="button">Copy Link</button>
+</div></aside>
+</section>
+<section id="media-panel" class="card pro-panel hidden">
+<div class="panel-head"><h2>▧ Media Library</h2><span id="media-count" class="counter">0</span></div><div class="panel-body">
+<div class="media-head"><p>मुख्य फोटो, गॅलरी आणि बातमीतील चित्रे निवडा. वेबसाइटवरील उपलब्ध फोटो येथे दिसतील.</p>
+<div class="media-actions"><input id="media-search" type="search" placeholder="फोटो / Slug शोधा"><input id="media-file" type="file" accept="image/jpeg,image/png,image/webp"><button id="media-upload" class="btn primary" type="button">Upload Image</button></div></div>
+<div id="media-grid" class="media-grid"></div><p class="aside-hint">कव्हर म्हणून निवडा किंवा लेखनात फोटो घाला. नवीन Upload साठी Server publishing जोडणी आवश्यक आहे.</p>
+</div></section>
+<section id="layout-panel" class="card layout-panel hidden"><div class="panel-head"><h2>⚙️ वेबसाइट व्यवस्थापन</h2></div><div class="panel-body">
+ <p>मुख्य मेनू, उपविभाग, ब्रेकिंग न्यूज व मुख्य बातम्या बदलू शकता. प्रत्येक ओळ म्हणजे एक entry.</p>
+ <div class="columns"><label class="field">मुख्य मेनू<textarea id="menu" rows="12"></textarea></label><label class="field">उपविभाग<textarea id="subcategories" rows="12"></textarea></label></div>
+ <div class="columns"><label class="field">Breaking / Scrolling News<textarea id="breaking" rows="8"></textarea></label><label class="field">Featured News Slugs<textarea id="featured-slugs" rows="8" placeholder="एक Slug एका ओळीत"></textarea></label></div>
+ <label class="field">Home Page — तीन कॉलम बातम्या (शीर्षक | विभाग)<textarea id="home-columns" rows="4" placeholder="जिल्हा | जिल्हा&#10;शेती | शेती&#10;धाराशिव टुडे | धाराशिव टुडे"></textarea><small>नेमक्या तीन ओळी. प्रत्येक ओळीत ‘दिसणारे शीर्षक | बातम्यांचा विभाग’. केवळ त्या विभागातील प्रकाशित बातम्या दाखवल्या जातील.</small></label>
+ <div class="columns"><label class="field">Slider Speed (seconds)<input id="slider-speed" type="number" min="3" max="30" value="7"></label><label class="field">टॅगलाइन<input id="tagline"></label></div>
+ <details class="settings-group" open><summary>🎨 Brand & Appearance</summary>
+<p>धाराशिव टुडेची नेव्ही ब्लू–लाल थीम कायम राखून लोगो, typography आणि spacing बदलू शकता.</p>
+<div class="columns"><label class="field">Theme Preset<select id="theme-preset"><option value="classic">Dharashiv Today Classic (Navy/Red)</option><option value="paper">Paper White (Red Headlines)</option><option value="night">Night Editorial (High Contrast)</option></select></label>
+<label class="field">News Density<select id="news-density"><option value="normal">Comfortable</option><option value="compact">Compact / eSakal-style</option></select></label></div>
+<div class="columns"><label class="field">Base Font Scale<select id="font-scale"><option value="1">Normal (100%)</option><option value="1.06">Large (106%)</option><option value="1.12">Extra Large (112%)</option></select></label>
+<label class="field">Logo Width<input type="range" id="logo-width" min="210" max="450" step="10" value="340"><small><span id="logo-width-label">340</span> px</small></label></div>
+<div class="brand-logo-upload">
+<img id="brand-logo-preview" src="../assets/logo-original-hd.png" alt="धाराशिव टुडे लोगो">
+<div><label class="field">HD Site Logo (PNG / WebP)<input id="brand-logo-file" type="file" accept="image/png,image/webp,image/jpeg"></label>
+<button id="upload-brand-logo" type="button" class="btn mini">⇧ Upload Brand Logo</button>
+<p class="aside-hint">नवीन लोगो Publish करण्यासाठी आधी Upload करा, मग “Save & Publish Appearance” वापरा. मूळ लोगो कायम ठेवण्यासाठी हे रिकामे ठेवा.</p></div></div>
+</details>
+<details class="settings-group" open><summary>▦ Homepage Sections</summary>
+<div class="settings-checks">
+<label><input type="checkbox" id="show-breaking" checked> Breaking / Live News Strip</label>
+<label><input type="checkbox" id="show-weather"> हवामान</label>
+<label><input type="checkbox" id="show-columns" checked> Home Three-Column Layout</label>
+<label><input type="checkbox" id="show-related" checked> Article Related News Sidebar</label>
+<label><input type="checkbox" id="show-category-sections" checked> इतर विभागांच्या बातम्या</label>
+</div>
+<div class="columns"><label class="field">Three-column: news items per column<input id="column-items" type="number" min="2" max="8" value="5"></label>
+<label class="field">Ticker speed (Seconds per headline)<input id="ticker-seconds" type="number" min="3" max="15" value="7"></label></div>
+<label class="field">Home Column Section Title<input id="columns-title" maxlength="90" placeholder="विभागवार बातम्या"></label>
+</details>
+<details class="settings-group"><summary>✍ Site Identity, Footer & SEO</summary>
+<label class="field">Site Title<input id="site-title" maxlength="110" placeholder="धाराशिव टुडे | जनतेचा आवाज"></label>
+<label class="field">Site Description<textarea id="site-description" rows="3" maxlength="350"></textarea></label>
+<label class="field">Footer Editorial Statement<textarea id="footer-statement" rows="3" maxlength="500"></textarea></label>
+<label class="field">Footer Copyright / Label<input id="footer-label" maxlength="180"></label>
+</details>
+<details class="settings-group"><summary>🔗 Social Channels</summary>
+<div class="columns"><label class="field">Facebook URL<input id="social-facebook" type="url" placeholder="https://www.facebook.com/..."></label>
+<label class="field">Instagram URL<input id="social-instagram" type="url" placeholder="https://www.instagram.com/..."></label>
+<label class="field">YouTube Channel URL<input id="social-youtube" type="url" placeholder="https://www.youtube.com/@..."></label>
+<label class="field">X URL<input id="social-x" type="url" placeholder="https://x.com/..."></label></div>
+</details>
+<div class="actions"><button id="save-layout" type="button" class="btn primary">💾 Save & Publish Appearance</button><a class="btn" href="../" target="_blank" rel="noopener">👁 View Website</a></div>
+ </div></section>
+</main>
+<dialog id="admin-change-dialog" class="admin-change-dialog" aria-labelledby="admin-change-title">
+  <form id="admin-change-form" autocomplete="off">
+    <h2 id="admin-change-title">🔑 Change Password</h2>
+    <p>सध्याचा पासवर्ड टाकून नवीन पासवर्ड सेट करा.</p>
+    <label for="admin-current-password">Current Password</label>
+    <input id="admin-current-password" type="password" autocomplete="current-password" required>
+    <label for="admin-new-password">New Password</label>
+    <input id="admin-new-password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required>
+    <label for="admin-confirm-password">Confirm New Password</label>
+    <input id="admin-confirm-password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required>
+    <p id="admin-change-message" class="admin-change-message" role="alert" aria-live="polite"></p>
+    <div class="admin-change-actions"><button type="button" id="admin-change-close" class="btn">Cancel</button><button type="submit" class="btn primary">Save Password</button></div>
+    <small>हा पासवर्ड फक्त या ब्राउझरमधील Login विंडोसाठी आहे. संपादनासाठी GitHub Token स्वतंत्रपणे आवश्यक आहे.</small>
+  </form>
+</dialog>
+<dialog id="preview-dialog" class="preview-dialog"><div class="dialog-head"><h2 id="preview-title"></h2><button class="btn mini" type="button" id="close-preview">✕</button></div><div id="preview-content"></div></dialog>
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js" defer></script>
+<script src="./admin-login.js?v=2" defer></script>
+<script src="./admin.js?v=13" defer></script>
+<script src="./admin-pro.js?v=6" defer></script>
+</body></html>

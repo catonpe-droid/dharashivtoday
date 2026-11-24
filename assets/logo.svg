@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 310" role="img" aria-label="धाराशिव टुडे">
+<defs><linearGradient id="blue" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#12345e"/><stop offset="1" stop-color="#00152e"/></linearGradient><linearGradient id="red" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f00"/><stop offset="1" stop-color="#a50000"/></linearGradient></defs>
+<path d="M315 18C145 36 30 120 25 180c1 65 90 103 235 114C135 262 66 216 71 170S158 58 315 18Z" fill="#d80a16"/>
+<path d="M265 39h408l-32 69H227Z" fill="url(#blue)"/><path d="M680 39h350l-32 69H648Z" fill="url(#red)"/>
+<path d="M98 115h620l-47 139H99Z" fill="url(#blue)"/><path d="M728 115h331l-37 139H679Z" fill="url(#red)"/>
+<g fill="#fff" font-family="Arial,sans-serif" font-weight="900" font-style="italic"><text x="267" y="92" font-size="47">DHARASHIV</text><text x="699" y="92" font-size="51">TODAY</text></g>
+<g fill="white" font-family="'Mukta','Noto Sans Devanagari',sans-serif" font-weight="900"><text x="139" y="223" font-size="116">धाराशिव</text><text x="737" y="223" font-size="126">टुडे</text></g>
+<text x="330" y="291" text-anchor="middle" font-size="27" font-weight="700" fill="#152543" font-family="'Mukta','Noto Sans Devanagari',sans-serif">जिल्ह्याचा आवाज... जनतेची बातमी!</text>
+</svg>
