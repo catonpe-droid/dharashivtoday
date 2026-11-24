@@ -330,21 +330,26 @@ a:focus-visible,button:focus-visible{outline:3px solid #f14949;outline-offset:3p
 @keyframes dt-ticker-loop{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @media(prefers-reduced-motion:reduce){.ticker-text.ticker-running{animation:none!important}}
 
-/* News channel ticker: clean, aligned two-tone strip, no overlapping ornament. */
-.ticker-container{padding-top:0;margin-top:9px}
-.breaking-news{height:44px;min-height:44px;display:flex;align-items:stretch;background:#182a4d;border:0;border-radius:4px;box-shadow:none;overflow:hidden;isolation:isolate}
-.breaking-news:after,.ticker-label:after{display:none;content:none}
-.ticker-label{flex:0 0 auto;display:flex;align-items:center;justify-content:center;align-self:stretch;margin:0;padding:0 17px;background:#d90012;color:#fff;border-right:3px solid #fff;white-space:nowrap;font:800 14px/1 Arial,sans-serif;font-style:normal;letter-spacing:.35px;z-index:1}
-.ticker-window{align-self:stretch;display:flex;align-items:center;justify-content:flex-start;min-width:0;padding:0 12px;mask-image:none;background:transparent;overflow:hidden}
-.ticker-text{height:100%;align-items:center}
-.ticker-group{height:100%;align-items:center;gap:22px;padding-right:22px}
-.ticker-group .ticker-item{font-size:16px;font-weight:600;line-height:1.45;align-items:center;gap:9px}
-.ticker-item:before{content:"";width:6px;height:6px;border-radius:50%;background:#ff3947;flex:0 0 6px}
+/* Reference TV ticker: italic red label, diagonal white/blue trim, navy strip. */
+.ticker-container{padding-top:0;margin-top:7px}
+.breaking-news{height:48px;min-height:48px;display:flex;align-items:stretch;background:#192a4e;border:0;border-radius:3px;box-shadow:none;overflow:hidden;isolation:isolate;position:relative}
+.breaking-news:after{display:block;content:"";position:absolute;right:0;bottom:0;width:0;height:0;border:0;border-right:9px solid #ed0014;border-top:9px solid transparent;z-index:3;pointer-events:none}
+.ticker-label{flex:0 0 184px;display:flex;align-items:center;justify-content:flex-start;align-self:stretch;margin:0;padding:0 14px;background:transparent;color:#fff;border:0;white-space:nowrap;font:800 italic 17px/1 Arial,sans-serif;letter-spacing:0;z-index:2;position:relative;isolation:isolate}
+.ticker-label:before{content:"";position:absolute;inset:0;background:#e5000c;clip-path:polygon(0 0,100% 0,calc(100% - 14px) 100%,0 100%);z-index:-1}
+.ticker-label:after{display:block;content:"";position:absolute;top:0;right:-1px;width:10px;height:100%;transform:skew(-16.3deg);transform-origin:top right;background:linear-gradient(to right,#fff 0 4px,#2980ef 4px 8px,#fff 8px 10px);border:0;pointer-events:none;z-index:1}
+.ticker-window{align-self:stretch;display:flex;align-items:center;justify-content:flex-start;min-width:0;padding:0 1px;mask-image:none;background:transparent;overflow:hidden;margin-left:-7px;position:relative}
+.ticker-window:before{content:"";position:absolute;right:0;top:0;bottom:0;width:190px;background-image:radial-gradient(circle,rgba(255,255,255,.09) 1.3px,transparent 1.7px);background-size:7px 7px;mask-image:linear-gradient(90deg,transparent,#000);pointer-events:none}
+.ticker-text{height:100%;align-items:center;position:relative}
+.ticker-group{height:100%;align-items:center;gap:24px;padding-right:24px}
+.ticker-group .ticker-item{font-size:17px;font-weight:700;line-height:1.45;align-items:center;gap:9px;white-space:nowrap}
+.ticker-item:before{content:"";width:7px;height:7px;border-radius:50%;background:#f00016;flex:0 0 7px}
 @media(max-width:540px){
  .ticker-container{margin-top:7px}
  .breaking-news{height:40px;min-height:40px}
- .ticker-label{font-size:11px;letter-spacing:0;padding:0 9px;border-right-width:2px}
- .ticker-window{padding:0 9px}
+ .ticker-label{flex-basis:130px;font-size:12px;padding:0 10px}
+ .ticker-label:before{clip-path:polygon(0 0,100% 0,calc(100% - 12px) 100%,0 100%)}
+ .ticker-label:after{width:8px;background:linear-gradient(to right,#fff 0 3px,#2980ef 3px 6px,#fff 6px 8px)}
+ .ticker-window{padding:0 1px;margin-left:-6px}
  .ticker-group .ticker-item{font-size:14px}
- .ticker-group{gap:16px;padding-right:16px}
+ .ticker-group{gap:18px;padding-right:18px}
 }
