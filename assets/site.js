@@ -29,14 +29,37 @@
   const requested=Array.isArray(layout.breaking)?layout.breaking.filter(x=>String(x||'').trim()):[];
   const headlines=requested.length?requested:latest.slice(0,7).map(p=>p.title);
   const news=headlines.length?headlines:[settings.breakingText||'जिल्ह्याचा आवाज... जनतेची बातमी!'];
-  $('tickerNews').innerHTML=[...news,...news].map((headline,i)=>{
+  const items=news.map((headline)=>{
    const clean=String(headline).replace(/\s+/g,' ').trim();
    const match=latest.find(p=>p.title.trim()===clean)||latest.find(p=>p.title.includes(clean)||clean.includes(p.title));
    const destination=match?storyUrl(match):ROOT+'?category='+encodeURIComponent('ताज्या बातम्या');
    const label=match?'संपूर्ण बातमी वाचा':'ताज्या बातम्या पाहा';
    return '<a class="ticker-item" href="'+destination+'" title="'+esc(clean)+'" aria-label="'+esc(clean+' — '+label)+'">'+esc(clean)+'</a>';
   }).join('');
-  $('tickerNews').style.animationDuration=Math.max(55,Math.min(140,Math.round(news.join(' ').length*0.32)))+'s';
+  const track=$('tickerNews');
+  track.classList.remove('ticker-running');
+  track.innerHTML='<span class="ticker-group">'+items+'</span><span class="ticker-group" aria-hidden="true">'+items+'</span>';
+  const first=track.firstElementChild, second=track.lastElementChild;
+  const measure=()=>{
+   const width=track.parentElement.clientWidth;
+   const base=first.scrollWidth;
+   if(!width||!base)return;
+   const copies=Math.max(1,Math.ceil((width+100)/base));
+   if(first.dataset.copies!==String(copies)){
+    first.innerHTML=items.repeat(copies);second.innerHTML=items.repeat(copies);
+    first.dataset.copies=String(copies);
+    second.querySelectorAll('a').forEach(a=>a.tabIndex=-1);
+   }
+   track.style.setProperty('--ticker-duration',Math.max(4,first.getBoundingClientRect().width/80)+'s');
+   track.classList.add('ticker-running');
+  };
+  measure();
+  if(document.fonts?.ready)document.fonts.ready.then(measure);
+  if(typeof ResizeObserver!=='undefined'){
+   if(track._tickerObserver)track._tickerObserver.disconnect();
+   track._tickerObserver=new ResizeObserver(measure);
+   track._tickerObserver.observe(track.parentElement);
+  }
  }
  function homepage(list){
   const featured=[...list.filter(x=>x.featured),...list.filter(x=>!x.featured)].filter((p,i,a)=>a.findIndex(q=>q.slug===p.slug)===i);
