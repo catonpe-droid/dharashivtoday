@@ -305,3 +305,15 @@ a:focus-visible,button:focus-visible{outline:3px solid #f14949;outline-offset:3p
  .ticker-text{animation:none!important;transform:none!important}
  .share-option,.news-card{transition:none!important}
 }
+
+
+/* Fit category panels to the actual number of populated sections, without orphan cards. */
+.category-band{grid-template-columns:repeat(var(--dt-category-cols,3),minmax(0,1fr));align-items:stretch;gap:19px}
+.category-band .topic-panel{height:100%;display:flex;flex-direction:column}
+.category-band .topic-stories{align-content:start;flex:1}
+.category-band .topic-main .thumb{aspect-ratio:16/9}
+@media(max-width:1050px){.category-band{grid-template-columns:repeat(2,minmax(0,1fr))}.category-band[data-count="1"]{grid-template-columns:minmax(0,1fr)}}
+@media(min-width:651px) and (max-width:1050px){.category-band[data-odd="true"]>.topic-panel:last-child{grid-column:1/-1}.category-band[data-odd="true"]>.topic-panel:last-child .topic-main .thumb{max-width:460px}}
+@media(max-width:650px){.category-band{grid-template-columns:minmax(0,1fr);gap:14px}}
+
+@media(min-width:1051px){.category-band[data-five="true"]{grid-template-columns:repeat(6,minmax(0,1fr))}.category-band[data-five="true"]>.topic-panel{grid-column:span 2}.category-band[data-five="true"]>.topic-panel:nth-child(n+4){grid-column:span 3}}

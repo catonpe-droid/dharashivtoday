@@ -56,7 +56,14 @@
    const more=ROOT+'?category='+encodeURIComponent(cat);
    return '<section class="topic-panel"><div class="topic-heading"><h3>'+esc(cat)+'</h3><span class="heading-line"></span><a class="view-more" href="'+more+'">View More →</a></div><div class="topic-stories">'+(chosen.length?chosen.map((p,i)=>i===0?'<a class="topic-main" href="'+storyUrl(p)+'">'+cover(p)+'<strong>'+esc(p.title)+'</strong>'+(relevant.includes(p)?'':'<small>इतर महत्त्वाच्या बातम्या</small>')+'</a>':compactRow(p,!relevant.includes(p))).join(''):'<p>या विभागातील बातम्या लवकरच.</p>')+'</div></section>';
   };
-  $('categoryBand').innerHTML=sectionCats.map(sectionHTML).join('');
+  const band=$('categoryBand');
+  band.dataset.count=String(sectionCats.length);
+  band.dataset.odd=String(sectionCats.length%2===1);
+  const cols=sectionCats.length<=4?Math.max(1,sectionCats.length):sectionCats.length===5?3:3;
+  band.style.setProperty('--dt-category-cols',String(cols));
+  band.innerHTML=sectionCats.map(sectionHTML).join('');
+  band.closest('.category-section').hidden=sectionCats.length===0;
+  if(sectionCats.length===5){band.dataset.five='true';}else{delete band.dataset.five;}
  }
  function listing(cat,list){
   $('homeSections').hidden=true;$('listingSections').hidden=false;$('articleSection').hidden=true;
