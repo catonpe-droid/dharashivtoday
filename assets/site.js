@@ -22,7 +22,6 @@
  function nav(){
   const menu=Array.isArray(layout.menu)&&layout.menu.length?layout.menu:categories;
   $('navLinks').innerHTML=menu.map((cat,i)=>'<a data-category="'+esc(cat)+'" href="'+(i===0?ROOT:ROOT+'?category='+encodeURIComponent(cat))+'">'+(i===0?'<svg class="nav-home-icon" xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#d60012" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9"/><path d="M10 21v-7h4v7"/></svg>':esc(cat))+'</a>').join('');
-  $('footerCategories').innerHTML=menu.slice(1).map(t=>'<a href="'+ROOT+'?category='+encodeURIComponent(t)+'">'+esc(t)+'</a>').join('');
   $('listingLinks').innerHTML=menu.slice(1).map(t=>'<a href="'+ROOT+'?category='+encodeURIComponent(t)+'">'+esc(t)+'</a>').join('');
  }
  function breaking(list){
