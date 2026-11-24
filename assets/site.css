@@ -320,3 +320,12 @@ a:focus-visible,button:focus-visible{outline:3px solid #f14949;outline-offset:3p
 
 /* Three-story category preview: consistent rows, labeled supplementary news. */
 .category-band .topic-main{min-height:0;display:flex;flex-direction:column;gap:0}.category-band .topic-main strong{min-height:2.84em}.category-band .topic-row{min-height:88px}.category-band .topic-row .topic-demo-label{color:#63748a;font-size:11px}.topic-demo-empty{opacity:.65;pointer-events:none}.topic-demo-empty .thumb .placeholder{background:#e8edf4;color:#64748b;font-size:26px}
+
+/* Continuous breaking-news track: no fade or empty reset interval. */
+.ticker-window{mask-image:none;padding-left:15px;min-width:0;justify-content:flex-start}
+.ticker-text{flex:none;gap:0;animation:none;will-change:transform}
+.ticker-text.ticker-running{animation:dt-ticker-loop var(--ticker-duration,40s) linear infinite}
+.ticker-group{display:inline-flex;flex:none;align-items:center;gap:22px;padding-right:22px;white-space:nowrap}
+.ticker-group .ticker-item{flex:none;gap:9px;line-height:1.5}
+@keyframes dt-ticker-loop{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.ticker-text.ticker-running{animation:none!important}}
