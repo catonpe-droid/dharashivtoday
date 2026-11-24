@@ -42,7 +42,7 @@
   const first=track.firstElementChild, second=track.lastElementChild;
   const measure=()=>{
    const width=track.parentElement.clientWidth;
-   const base=first.scrollWidth;
+   const base=first.getBoundingClientRect().width/(Number(first.dataset.copies)||1);
    if(!width||!base)return;
    const copies=Math.max(1,Math.ceil((width+100)/base));
    if(first.dataset.copies!==String(copies)){
