@@ -13,8 +13,8 @@
   const changeForm=document.getElementById('admin-change-form');
   const changeMessage=document.getElementById('admin-change-message');
   const closeButton=document.getElementById('admin-change-close');
-  const STORAGE_KEY='dharashivtoday.admin.overlay.password.v1';
-  const DEFAULT_SHA256='fec35c04f5b701c3d9875e5c0dbbf5ba19e24ac97813d5d943058ca0de0bf926';
+  const STORAGE_KEY='dharashivtoday.admin.overlay.password.v2';
+  const DEFAULT_SHA256='a02419ca43d426af1e8ef574fc9f2d7749fa40010eb33a5aa79ac25e7444b81d';
   const encoder=new TextEncoder();
   const hex=bytes=>Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
   if(!form||!layer||!usernameInput||!passwordInput)return;
