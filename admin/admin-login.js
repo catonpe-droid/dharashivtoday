@@ -49,21 +49,43 @@
     const data=encoder.encode('dalalnama-overlay-v1|admin|'+password);
     return hex(new Uint8Array(await crypto.subtle.digest('SHA-256',data)))===DEFAULT_SHA256;
   }
-  function forgetDevice(){try{localStorage.removeItem(REMEMBER_KEY)}catch{}}
+  // Keep the non-secret overlay preference on this browser only.
+  const COOKIE_NAME='dt_admin_remember_v2';
+  function forgetDevice(){
+    try{localStorage.removeItem(REMEMBER_KEY)}catch{}
+    try{document.cookie=COOKIE_NAME+'=; Max-Age=0; Path=/dharashivtoday/admin/; Secure; SameSite=Strict'}catch{}
+  }
   function rememberDevice(){
+    const credential=storedCredential();
+    if(credential?.invalid)return false;
+    const raw=JSON.stringify({expires:Date.now()+REMEMBER_MS,credentialVersion:credential?.salt||'default'});
     try{
-      const credential=localStorage.getItem(STORAGE_KEY)||'default';
-      localStorage.setItem(REMEMBER_KEY,JSON.stringify({expires:Date.now()+REMEMBER_MS,credentialVersion:credential==='default'?'default':JSON.parse(credential).salt}));
+      localStorage.setItem(REMEMBER_KEY,raw);
+      if(localStorage.getItem(REMEMBER_KEY)===raw)return true;
     }catch{}
+    // A path-scoped cookie is a fallback for browsers that reject localStorage.
+    try{
+      document.cookie=COOKIE_NAME+'='+encodeURIComponent(raw)+'; Max-Age=2592000; Path=/dharashivtoday/admin/; Secure; SameSite=Strict';
+      return rememberedDevice();
+    }catch{return false}
   }
   function rememberedDevice(){
+    const candidates=[];
+    try{candidates.push(localStorage.getItem(REMEMBER_KEY))}catch{}
     try{
-      const raw=localStorage.getItem(REMEMBER_KEY);
-      if(!raw)return false;
-      const saved=JSON.parse(raw);
-      const credential=storedCredential();
-      if(!credential?.invalid && saved.expires>Date.now() && saved.credentialVersion===(credential?.salt||'default'))return true;
+      const cookie=document.cookie.split(';').map(x=>x.trim()).find(x=>x.startsWith(COOKIE_NAME+'='));
+      if(cookie)candidates.push(decodeURIComponent(cookie.slice(COOKIE_NAME.length+1)));
     }catch{}
+    const credential=storedCredential();
+    if(!credential?.invalid){
+      for(const raw of candidates){
+        if(!raw)continue;
+        try{
+          const saved=JSON.parse(raw);
+          if(Number.isFinite(saved.expires)&&saved.expires>Date.now()&&saved.credentialVersion===(credential?.salt||'default'))return true;
+        }catch{}
+      }
+    }
     forgetDevice();return false;
   }
   function unlock(){
@@ -84,7 +106,11 @@
         feedback.textContent='Username किंवा Password चुकीचा आहे.';
         passwordInput.value='';passwordInput.focus();return;
       }
-      if(rememberInput?.checked)rememberDevice();else forgetDevice();
+      if(rememberInput?.checked){
+        if(!rememberDevice()){
+          alert('या ब्राउझरमध्ये Login जतन झाले नाही. Cookies / site data सक्षम करा. Incognito किंवा clear-on-exit मोड वापरू नका. आत्ता Login सुरू राहील.');
+        }
+      }else forgetDevice();
       unlock();
     }catch{
       feedback.textContent='Login तपासता आले नाही. पुन्हा प्रयत्न करा.';
