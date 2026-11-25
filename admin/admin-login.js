@@ -16,10 +16,10 @@
   const rememberInput=document.getElementById('admin-remember-pc');
   const logoutButton=document.getElementById('admin-overlay-logout');
   // Convenience for this visual overlay only; never store plaintext passwords or publishing keys.
-  const REMEMBER_KEY='dharashivtoday.admin.overlay.remember.v2';
+  const REMEMBER_KEY='dharashivtoday.admin.overlay.remember.v3';
   const REMEMBER_MS=30*24*60*60*1000;
-  const STORAGE_KEY='dharashivtoday.admin.overlay.password.v3';
-  const DEFAULT_SHA256='02977cab54fda42ab7b35fa06fe1da74f1fde1afc70daac232bedba7a49ababb';
+  const STORAGE_KEY='dharashivtoday.admin.overlay.password.v4';
+  const DEFAULT_SHA256='de79d9d3a5983cc6c5c6069e47cc476b3b0a43c5e95763d4f02906c124885afb';
   const encoder=new TextEncoder();
   const hex=bytes=>Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
   if(!form||!layer||!usernameInput||!passwordInput)return;
@@ -50,7 +50,7 @@
     return hex(new Uint8Array(await crypto.subtle.digest('SHA-256',data)))===DEFAULT_SHA256;
   }
   // Keep the non-secret overlay preference on this browser only.
-  const COOKIE_NAME='dt_admin_remember_v2';
+  const COOKIE_NAME='dt_admin_remember_v3';
   function forgetDevice(){
     try{localStorage.removeItem(REMEMBER_KEY)}catch{}
     try{document.cookie=COOKIE_NAME+'=; Max-Age=0; Path=/dharashivtoday/admin/; Secure; SameSite=Strict'}catch{}
