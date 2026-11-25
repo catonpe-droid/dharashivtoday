@@ -3,7 +3,7 @@
  const ROOT='/dharashivtoday/';
  const $=id=>document.getElementById(id);
  const esc=s=>String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[x]));
- const categories=['मुख्यपृष्ठ','ताज्या बातम्या','विशेष बातम्या','जिल्हा','राजकारण','शेती','विकास','शिक्षण','नोकरी','पर्यटन','क्रीडा','मनोरंजन','विशेष लेख','संपादकीय'];
+ const categories=['मुख्यपृष्ठ','ताज्या बातम्या','विशेष बातम्या','जिल्हा','क्राईम','राजकारण','शेती','विकास','शिक्षण','नोकरी','पर्यटन','क्रीडा','मनोरंजन','विशेष लेख','संपादकीय'];
  const district=['धाराशिव','तुळजापूर','कळंब','भूम','परंडा','वाशी','उमरगा','लोहारा'];
  const CHANNEL='UCgXmATfMB5qHTrwDBlcZNpA';
  const PLAYLIST='UU'+CHANNEL.slice(2);
@@ -71,7 +71,7 @@
   $('specialList').innerHTML=specialStories.map(x=>'<a class="special-card" href="'+storyUrl(x)+'"><div class="special-story-copy"><span class="tag">'+esc(x.category||'विशेष')+'</span><h3>'+esc(x.title)+'</h3></div>'+cover(x)+'</a>').join('')||'<div class="brief-empty">विशेष बातम्या येथे प्रसिद्ध होतील.</div>';
   $('latestGrid').innerHTML=list.slice(0,6).map(card).join('')||'<div class="empty-results">Admin मधून बातम्या प्रकाशित झाल्यावर येथे दिसतील.</div>';
   $('districtGrid').innerHTML=(settings.districts||district).map(x=>'<a href="'+ROOT+'?q='+encodeURIComponent(x)+'">'+esc(x)+' →</a>').join('');
-  const sectionCats=['राजकारण','शेती','विकास','शिक्षण','नोकरी','पर्यटन'].filter(cat=>list.some(p=>p.category===cat));
+  const sectionCats=['क्राईम','राजकारण','शेती','विकास','शिक्षण','नोकरी','पर्यटन'].filter(cat=>list.some(p=>p.category===cat));
   // Use unique real stories to demonstrate the three-card layout while a section is short.
   // Supplementary stories are explicitly labeled with their actual category.
   const reserved=new Set(sectionCats.flatMap(cat=>list.filter(p=>p.category===cat).slice(0,3).map(p=>p.slug)));
