@@ -16,10 +16,10 @@
   const rememberInput=document.getElementById('admin-remember-pc');
   const logoutButton=document.getElementById('admin-overlay-logout');
   // Convenience for this visual overlay only; never store plaintext passwords or publishing keys.
-  const REMEMBER_KEY='dharashivtoday.admin.overlay.remember.v1';
+  const REMEMBER_KEY='dharashivtoday.admin.overlay.remember.v2';
   const REMEMBER_MS=30*24*60*60*1000;
-  const STORAGE_KEY='dharashivtoday.admin.overlay.password.v2';
-  const DEFAULT_SHA256='a02419ca43d426af1e8ef574fc9f2d7749fa40010eb33a5aa79ac25e7444b81d';
+  const STORAGE_KEY='dharashivtoday.admin.overlay.password.v3';
+  const DEFAULT_SHA256='02977cab54fda42ab7b35fa06fe1da74f1fde1afc70daac232bedba7a49ababb';
   const encoder=new TextEncoder();
   const hex=bytes=>Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
   if(!form||!layer||!usernameInput||!passwordInput)return;
