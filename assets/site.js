@@ -152,7 +152,7 @@
   const relatedHtml=related.map(x=>'<a class="related-story" href="'+storyUrl(x)+'">'+cover(x)+'<span>'+esc(x.title)+'</span></a>').join('');
   const main='<article class="article-main"><div class="article-kicker"><span class="article-category">'+esc(p.category||'बातमी')+'</span><span class="article-source-brand">DHARASHIV TODAY</span></div>'
    +'<h1>'+esc(p.title)+'</h1>'
-   +'<div class="article-meta">'+iconSvg('share')+' <span>'+esc(dateFmt(p.date))+'</span> <span class="article-meta-dot">•</span> <span>'+esc((!p.author||/^(धाराशिव टुडे(?: न्यूज)? डे[स्]?[क]्स?|धाराशिव टुडे(?: न्यूज)? डेस्क)$/u.test(p.author.trim()))?'धाराशिव टुडे डेस्क':p.author)+'</span></div>'
+   +'<div class="article-meta">'+iconSvg('share')+' <span>'+esc(dateFmt(p.date))+'</span> <span class="article-meta-dot">•</span> <span>'+esc(!p.author||/^(धाराशिव (?:टुडे|लाईव्ह)(?: न्यूज)? डेस्क)$/u.test(String(p.author).trim())?'धाराशिव टुडे डेस्क':p.author)+'</span></div>'
    +(subheading(p)?'<p class="article-intro">'+esc(subheading(p))+'</p>':'')
    +(image(p,true)?'<figure class="article-figure"><img src="'+esc(image(p,true))+'" alt="'+esc(p.title)+'" decoding="async"><figcaption>छायाचित्र : '+esc(p.imageCredit||p.source||'धाराशिव टुडे')+'</figcaption></figure>':'')
    +'<div class="article-body">'+html+'</div>'
