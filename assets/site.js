@@ -16,7 +16,8 @@
  const image=(p,full=false)=>{const raw=String((!full&&p.thumbImage)||p.image||'');if(/^assets\/(?:uploads|branding)\/[a-zA-Z0-9_.-]+\.(?:png|jpg|jpeg|webp)$/i.test(raw))return ROOT+raw;try{const u=new URL(raw);if(u.protocol==='https:'&&u.hostname==='dharashivlive.com'&&u.pathname.startsWith('/wp-content/uploads/')&&/\.(png|jpg|jpeg|webp)$/i.test(u.pathname))return u.href}catch{}return ''};
  const cover=p=>{const src=image(p,true);return '<span class="thumb">'+(src?'<img loading="lazy" decoding="async" src="'+esc(src)+'" alt="'+esc(p.title)+'">':'<span class="placeholder">धाराशिव टुडे</span>')+'</span>'};
  const info=p=>'<div class="post-mini-meta">'+esc(dateFmt(p.date))+'</div>';
- const card=p=>'<a class="news-card" href="'+storyUrl(p)+'">'+cover(p)+'<div class="category">'+esc(p.category||'बातमी')+'</div><h3>'+esc(p.title)+'</h3>'+(p.summary?'<p>'+esc(p.summary).slice(0,100)+'</p>':'')+info(p)+'</a>';
+ const subheading=p=>{const explicit=String(p.subheading||p.subtitle||'').trim();if(explicit)return explicit;const summary=String(p.summary||p.description||'').replace(/\s*\[…\]\s*$/,'').trim();if(!summary)return '';const first=summary.match(/^.*?[.!?।](?=\s|$)/u)?.[0]||summary;return first.length<=180?first:first.slice(0,180).replace(/\s+\S*$/u,'')+'…';};
+ const card=p=>'<a class="news-card" href="'+storyUrl(p)+'">'+cover(p)+'<div class="category">'+esc(p.category||'बातमी')+'</div><h3>'+esc(p.title)+'</h3>'+(subheading(p)?'<p>'+esc(subheading(p))+'</p>':'')+info(p)+'</a>';
  const filter=(p,cat)=>!cat||cat==='मुख्यपृष्ठ'||cat==='ताज्या बातम्या'||p.category===cat||(cat==='विशेष बातम्या'&&(p.featured||p.category==='विशेष लेख'))||(cat==='जिल्हा'&&(p.category==='जिल्हा'||(p.tags||[]).some(t=>district.includes(t))));
  const inSearch=p=>!query||[p.title,p.summary,p.category,p.author,...(p.tags||[])].join(' ').toLocaleLowerCase('mr-IN').includes(query.toLocaleLowerCase('mr-IN'));
  function nav(){
@@ -151,8 +152,8 @@
   const relatedHtml=related.map(x=>'<a class="related-story" href="'+storyUrl(x)+'">'+cover(x)+'<span>'+esc(x.title)+'</span></a>').join('');
   const main='<article class="article-main"><div class="article-kicker"><span class="article-category">'+esc(p.category||'बातमी')+'</span><span class="article-source-brand">DHARASHIV TODAY</span></div>'
    +'<h1>'+esc(p.title)+'</h1>'
-   +'<div class="article-meta">'+iconSvg('share')+' <span>'+esc(dateFmt(p.date))+'</span> <span class="article-meta-dot">•</span> <span>'+esc(p.author||'धाराशिव टुडे न्यूज डेस्क')+'</span></div>'
-   +(p.summary?'<p class="article-intro">'+esc(p.summary)+'</p>':'')
+   +'<div class="article-meta">'+iconSvg('share')+' <span>'+esc(dateFmt(p.date))+'</span> <span class="article-meta-dot">•</span> <span>'+esc((!p.author||/^(धाराशिव टुडे(?: न्यूज)? डे[स्]?[क]्स?|धाराशिव टुडे(?: न्यूज)? डेस्क)$/u.test(p.author.trim()))?'धाराशिव टुडे डेस्क':p.author)+'</span></div>'
+   +(subheading(p)?'<p class="article-intro">'+esc(subheading(p))+'</p>':'')
    +(image(p,true)?'<figure class="article-figure"><img src="'+esc(image(p,true))+'" alt="'+esc(p.title)+'" decoding="async"><figcaption>छायाचित्र : '+esc(p.imageCredit||p.source||'धाराशिव टुडे')+'</figcaption></figure>':'')
    +'<div class="article-body">'+html+'</div>'
    +(p.sourceUrl&&/^https:\/\/dharashivlive\.com\//.test(p.sourceUrl)?'<div class="source-credit">स्रोत : <a href="'+esc(p.sourceUrl)+'" target="_blank" rel="noopener noreferrer">धाराशिव लाईव्ह — मूळ बातमी</a> · '+esc(dateFmt(p.date))+'</div>':'')
