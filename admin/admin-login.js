@@ -13,6 +13,11 @@
   const changeForm=document.getElementById('admin-change-form');
   const changeMessage=document.getElementById('admin-change-message');
   const closeButton=document.getElementById('admin-change-close');
+  const rememberInput=document.getElementById('admin-remember-pc');
+  const logoutButton=document.getElementById('admin-overlay-logout');
+  // Convenience for this visual overlay only; never store plaintext passwords or publishing keys.
+  const REMEMBER_KEY='dharashivtoday.admin.overlay.remember.v1';
+  const REMEMBER_MS=30*24*60*60*1000;
   const STORAGE_KEY='dharashivtoday.admin.overlay.password.v2';
   const DEFAULT_SHA256='a02419ca43d426af1e8ef574fc9f2d7749fa40010eb33a5aa79ac25e7444b81d';
   const encoder=new TextEncoder();
@@ -44,6 +49,32 @@
     const data=encoder.encode('dalalnama-overlay-v1|admin|'+password);
     return hex(new Uint8Array(await crypto.subtle.digest('SHA-256',data)))===DEFAULT_SHA256;
   }
+  function forgetDevice(){try{localStorage.removeItem(REMEMBER_KEY)}catch{}}
+  function rememberDevice(){
+    try{
+      const credential=localStorage.getItem(STORAGE_KEY)||'default';
+      localStorage.setItem(REMEMBER_KEY,JSON.stringify({expires:Date.now()+REMEMBER_MS,credentialVersion:credential==='default'?'default':JSON.parse(credential).salt}));
+    }catch{}
+  }
+  function rememberedDevice(){
+    try{
+      const raw=localStorage.getItem(REMEMBER_KEY);
+      if(!raw)return false;
+      const saved=JSON.parse(raw);
+      const credential=storedCredential();
+      if(!credential?.invalid && saved.expires>Date.now() && saved.credentialVersion===(credential?.salt||'default'))return true;
+    }catch{}
+    forgetDevice();return false;
+  }
+  function unlock(){
+    document.body.classList.remove('admin-locked');
+    layer.hidden=true;
+    form.reset();
+  }
+  logoutButton?.addEventListener('click',()=>{
+    forgetDevice();
+    location.reload();
+  });
   form.addEventListener('submit',async event=>{
     event.preventDefault();
     const submit=form.querySelector('[type=submit]');
@@ -53,9 +84,8 @@
         feedback.textContent='Username किंवा Password चुकीचा आहे.';
         passwordInput.value='';passwordInput.focus();return;
       }
-      document.body.classList.remove('admin-locked');
-      layer.hidden=true;
-      form.reset();
+      if(rememberInput?.checked)rememberDevice();else forgetDevice();
+      unlock();
     }catch{
       feedback.textContent='Login तपासता आले नाही. पुन्हा प्रयत्न करा.';
     }finally{submit.disabled=false}
@@ -90,6 +120,7 @@
         const salt=hex(crypto.getRandomValues(new Uint8Array(16)));
         const hash=await pbkdf2(next,salt);
         localStorage.setItem(STORAGE_KEY,JSON.stringify({version:1,salt,hash,iterations:180000}));
+        forgetDevice();
         changeForm.reset();changeDialog.close();
         const status=document.getElementById('status');
         if(status){status.textContent='✅ या ब्राउझरचा Login पासवर्ड बदलला.';status.className='notice success'}
@@ -98,5 +129,5 @@
       }finally{submit.disabled=false}
     });
   }
-  usernameInput.focus();
+  if(rememberedDevice())unlock();else usernameInput.focus();
 })();
