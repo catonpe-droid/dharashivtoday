@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#171717"><title>धाराशिव टुडे | News Admin Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet"><link href="./admin.css?v=10" rel="stylesheet"></head><body class="admin-locked">
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet"><link href="./admin.css?v=11" rel="stylesheet"></head><body class="admin-locked">
 <section class="admin-login-overlay" id="admin-login-overlay" role="dialog" aria-modal="true" aria-labelledby="admin-login-title">
   <div class="admin-login-card">
     <div class="admin-login-logo"><span>धाराशिव</span> टुडे</div>
@@ -17,6 +17,8 @@
       <input id="admin-login-username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Username" required>
       <label for="admin-login-password">Password</label>
       <input id="admin-login-password" name="password" type="password" autocomplete="current-password" placeholder="Password" required>
+      <label class="admin-remember-pc" for="admin-remember-pc"><input type="checkbox" id="admin-remember-pc"> Remember me on this PC</label>
+      <p class="admin-remember-note">फक्त स्वतःच्या संगणकावर वापरा. ३० दिवस पुन्हा Login आवश्यक नाही.</p>
       <p id="admin-login-feedback" class="admin-login-feedback" role="alert" aria-live="polite"></p>
       <button type="submit">Login <span aria-hidden="true">→</span></button>
     </form>
@@ -24,7 +26,7 @@
   </div>
 </section>
 <header class="top"><a class="brand" href="../"><strong>धाराशिव <span>टुडे</span></strong><small>NEWS ADMIN STUDIO</small></a>
-<div class="top-actions"><button id="admin-change-password" type="button" class="btn" title="Admin Login पासवर्ड बदला">🔑 Change Password</button><a class="btn" href="../" target="_blank" rel="noopener">🌐 Website</a><button id="refresh" type="button" class="btn">↻ Refresh</button><button id="new-top" type="button" class="btn primary">+ नवीन बातमी</button></div></header>
+<div class="top-actions"><button id="admin-overlay-logout" type="button" class="btn" title="या संगणकावरील Login विसरा">Log out</button><button id="admin-change-password" type="button" class="btn" title="Admin Login पासवर्ड बदला">🔑 Change Password</button><a class="btn" href="../" target="_blank" rel="noopener">🌐 Website</a><button id="refresh" type="button" class="btn">↻ Refresh</button><button id="new-top" type="button" class="btn primary">+ नवीन बातमी</button></div></header>
 <aside class="admin-navigation" aria-label="Admin sections">
 <div class="admin-nav-brand"><span>DN</span><div><strong>DHARASHIV TODAY</strong><small>EDITORIAL DESK</small></div></div>
 <div class="admin-nav-caption">CONTENT MANAGEMENT</div>
@@ -183,7 +185,7 @@
 </dialog>
 <dialog id="preview-dialog" class="preview-dialog"><div class="dialog-head"><h2 id="preview-title"></h2><button class="btn mini" type="button" id="close-preview">✕</button></div><div id="preview-content"></div></dialog>
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js" defer></script>
-<script src="./admin-login.js?v=3" defer></script>
+<script src="./admin-login.js?v=4" defer></script>
 <script src="./admin.js?v=14" defer></script>
 <script src="./admin-pro.js?v=6" defer></script>
 </body></html>
