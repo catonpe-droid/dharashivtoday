@@ -135,10 +135,10 @@
   function reset(){
     state.activeSlug='';
     $('post-form').reset();
-    $('title').value='';$('slug').value='';$('author').value='धाराशिव टुडे न्यूज डेस्क';
+    $('title').value='';$('slug').value='';$('author').value='धाराशिव टुडे डेस्क';
     $('date').value=dateNow();$('minutes').value='3';$('post-status').value='published';
     $('featured').checked=false;$('source-url').value='';$('source').value='';
-    $('summary').value='';$('body').value='';$('tags').value='';
+    $('subheading').value='';$('summary').value='';$('body').value='';$('tags').value='';
     $('type').value='बातमी';$('video').value='';$('seo-title').value='';$('seo-description').value='';$('seo-keywords').value='';
     window.DalalPro?.loadPost?.(null);
     categories('ताज्या बातम्या');clearPhoto();$('editor-title').textContent='📰 नवीन बातमी';
@@ -152,7 +152,8 @@
     $('title').value=item.title||'';
     $('slug').value=item.slug||'';
     categories(item.category||'ताज्या बातम्या');
-    $('author').value=item.author||'धाराशिव टुडे न्यूज डेस्क';
+    $('author').value=item.author||'धाराशिव टुडे डेस्क';
+    $('subheading').value=item.subheading||item.subtitle||'';
     $('summary').value=item.summary||item.description||'';
     $('body').value=Array.isArray(item.body)?item.body.join('\n\n'):String(item.body||'');
     $('tags').value=(item.tags||[]).join(', ');
@@ -271,7 +272,7 @@
     let img=old?.image||'assets/uploads/'+slug+'.png';
     if(isRename&&img==='assets/uploads/'+old.slug+'.png')img='assets/uploads/'+slug+'.png';
     const item={
-      ...(old||{}),slug,title,summary,category:$('category').value,author:$('author').value.trim()||'धाराशिव टुडे न्यूज डेस्क',
+      ...(old||{}),slug,title,summary,subheading:$('subheading').value.trim(),category:$('category').value,author:$('author').value.trim()||'धाराशिव टुडे डेस्क',
       body,description:summary,date,readMinutes:Math.max(1,Math.min(30,Number($('minutes').value)||3)),
       tags:[...new Set($('tags').value.split(',').map(x=>x.trim()).filter(Boolean))].slice(0,15),
       source:$('source').value.trim(),sourceUrl:$('source-url').value.trim(),
@@ -346,7 +347,7 @@
   function preview(){
     const d=$('preview-dialog');$('preview-title').textContent=$('title').value.trim()||'बातमीचे शीर्षक';
     const root=$('preview-content');root.replaceChildren();
-    const summary=document.createElement('p');summary.textContent=$('summary').value;summary.style.fontWeight='700';root.append(summary);
+    const summary=document.createElement('p');summary.textContent=$('subheading').value;summary.style.fontWeight='700';root.append(summary);
     for(const paragraph of splitBody($('body').value)){
       const node=document.createElement(paragraph.startsWith('## ')?'h2':'p');
       node.textContent=paragraph.startsWith('## ')?paragraph.slice(3):paragraph;
