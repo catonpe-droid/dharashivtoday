@@ -222,3 +222,8 @@ body.admin-locked>.preview-dialog{visibility:hidden!important;pointer-events:non
 .admin-change-dialog .admin-change-actions .btn{flex:1;max-width:190px}
 .admin-change-dialog small{color:#647182;font-size:12px;line-height:1.5;margin-top:10px}
 @media(max-width:500px){.admin-change-dialog{padding:22px 20px}}
+
+/* Optional remembered visual login on a private device. */
+.admin-login-card .admin-remember-pc{display:flex;align-items:center;gap:9px;font-weight:600;cursor:pointer}
+.admin-login-card .admin-remember-pc input{width:17px;height:17px;margin:0;padding:0;accent-color:#bc111e;flex-shrink:0}
+.admin-remember-note{font-size:12px;color:#59616e;line-height:1.4;margin:0 0 3px}
