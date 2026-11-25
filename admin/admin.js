@@ -13,7 +13,7 @@
   const $=id=>document.getElementById(id);
   const state={token:'',news:[],newsSha:'',layout:{},layoutSha:'',activeSlug:'',filter:'all',selected:new Set(),busy:false,ready:false,photoUrl:''};
   const allowedSlug=/^[a-z0-9][a-z0-9_-]{2,95}$/;
-  const defaultCategories=["ताज्या बातम्या","विशेष बातम्या","जिल्हा","राजकारण","शेती","विकास","शिक्षण","नोकरी","पर्यटन","क्रीडा","मनोरंजन","विशेष लेख","संपादकीय","धाराशिव","तुळजापूर","कळंब","भूम","परंडा","वाशी","उमरगा","लोहारा"];
+  const defaultCategories=["ताज्या बातम्या","विशेष बातम्या","जिल्हा","क्राईम","राजकारण","शेती","विकास","शिक्षण","नोकरी","पर्यटन","क्रीडा","मनोरंजन","विशेष लेख","संपादकीय","धाराशिव","तुळजापूर","कळंब","भूम","परंडा","वाशी","उमरगा","लोहारा"];
   const busyButtons=['publish','draft','delete','bulk-delete','save-layout'];
   const dateNow=()=>new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'});
   function message(text,type=''){
