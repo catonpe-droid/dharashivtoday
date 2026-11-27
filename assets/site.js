@@ -2,14 +2,16 @@
 (async()=>{
 // NEWS_PAGE_VIEWS_V1 — anonymous, article-scoped browser key; no public display.
  const trackedViews=new Set(),pendingViews=new Set(),viewRecords=new Map();
- function trackArticleView(slug){
+ async function pageViewsGoogleURL(){try{const r=await fetch('/assets/pageviews-config.json',{cache:'no-store'});if(!r.ok)return '';const u=String((await r.json()).google_web_app||'');return /^https:\/\/script\.google\.com\/macros\/s\/[a-zA-Z0-9_-]+\/exec$/.test(u)?u:''}catch{return ''}}
+ async function trackArticleView(slug){
   slug=String(slug||'');
   if(!['https://dharashivtoday.com','https://www.dharashivtoday.com'].includes(location.origin)||!/^[a-z0-9][a-z0-9_-]{2,115}$/.test(slug)||trackedViews.has(slug)||pendingViews.has(slug))return;
   if(document.visibilityState!=='visible'){
     const resume=()=>{if(document.visibilityState==='visible'){document.removeEventListener('visibilitychange',resume);trackArticleView(slug)}};
     document.addEventListener('visibilitychange',resume);return;
   }
-  const key='news-pv-v1:'+slug;
+  const google=await pageViewsGoogleURL();if(pendingViews.has(slug)||trackedViews.has(slug))return;
+  const key=(google?'news-pv-google-v1:':'news-pv-v1:')+slug;
   let record=viewRecords.get(slug);
   try{record=JSON.parse(localStorage.getItem(key)||'null')||record}catch{}
   if(record?.sent){trackedViews.add(slug);return}
@@ -17,8 +19,8 @@
   viewRecords.set(slug,record);
   try{localStorage.setItem(key,JSON.stringify(record))}catch{}
   pendingViews.add(slug);
-  fetch('https://dharashivtoday-editor.catonpe.workers.dev/page-view',{method:'POST',body:JSON.stringify({slug,reader:record.id}),headers:{'Content-Type':'text/plain'},credentials:'omit',keepalive:true,referrerPolicy:'no-referrer'}).then(r=>{
-    if(!r.ok)return;record.sent=true;trackedViews.add(slug);
+  fetch(google||'https://dharashivtoday-editor.catonpe.workers.dev/page-view',{method:'POST',body:JSON.stringify(google?{action:'record',site:'dharashivtoday',slug,reader:record.id}:{slug,reader:record.id}),headers:{'Content-Type':'text/plain'},credentials:'omit',keepalive:true,referrerPolicy:'no-referrer'}).then(async r=>{
+    if(!r.ok||(google&&!(await r.json()).ok))return;record.sent=true;trackedViews.add(slug);
     try{localStorage.setItem(key,JSON.stringify(record))}catch{}
   }).catch(()=>{}).finally(()=>pendingViews.delete(slug));
  }

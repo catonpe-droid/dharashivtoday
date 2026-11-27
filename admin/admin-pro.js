@@ -102,7 +102,7 @@ async function showPageViews(posts){
  const total=$('metric-pageviews'),status=$('pageviews-status'),list=$('pageviews-list'),search=$('pageviews-search');
  total.textContent='—';list.replaceChildren();
  search.oninput=null;
- if(!CMS.hasToken()){status.textContent='आकडे पाहण्यासाठी Admin Login आवश्यक.';return}
+ const login=$('pageviews-login');login.hidden=true;login.onclick=()=>{const key=prompt('Page Views Key');if(key){CMS.setPageViewsKey(key.trim());showPageViews(posts)}};
  status.textContent='Page Views लोड होत आहेत…';
  try{
   const response=await CMS.getPageViews();if(request!==pageViewsSequence)return;
@@ -123,7 +123,7 @@ async function showPageViews(posts){
    if(!list.childNodes.length)list.textContent='बातमी उपलब्ध नाही.';
   }
   search.oninput=draw;draw();
- }catch(e){if(request===pageViewsSequence)status.textContent=e.message+' • Refresh करून पुन्हा तपासा.';}
+ }catch(e){if(request===pageViewsSequence){if(e.message==='PV_KEY_REQUIRED'){status.textContent='';login.hidden=false;}else status.textContent=e.message;}}
 }
 function dashboard(posts){
  const all=Array.isArray(posts)?posts:[];
