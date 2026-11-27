@@ -13,7 +13,8 @@ const REPO='catonpe-droid/dharashivtoday';
 const BRANCH='main';
 const ALLOWED_ORIGINS=new Set([
   'https://catonpe-droid.github.io',
-  'https://catonpe-droid.github.io'
+  'https://www.dharashivtoday.com',
+  'https://dharashivtoday.com'
 ]);
 const FILES=new Set(['data/news.json','data/layout.json','data/media.json']);
 const UPLOAD_PATTERN=/^assets\/(?:uploads|branding)\/[a-z0-9][a-z0-9_.-]{0,150}\.(?:jpg|jpeg|webp|png)$/i;
