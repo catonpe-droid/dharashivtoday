@@ -1,0 +1,23 @@
+{
+  "name": "dharashivtoday-editor",
+  "main": "backend/dharashivtoday-editor-worker.js",
+  "compatibility_date": "2026-11-27",
+  "workers_dev": true,
+  "keep_vars": true,
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "PAGE_VIEWS",
+        "class_name": "NewsPageViews"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "pageviews-v1",
+      "new_sqlite_classes": [
+        "NewsPageViews"
+      ]
+    }
+  ]
+}

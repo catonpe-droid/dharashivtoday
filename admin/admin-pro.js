@@ -96,8 +96,38 @@ function updateSEO(){
  $('seo-preview-url').textContent=SITE+'batmi/'+encodeURIComponent(text($('slug').value||'your-news-url'))+'/';
  const sum=$('summary');if(sum){let status=$('summary-count');if(!status){status=document.createElement('small');status.id='summary-count';sum.insertAdjacentElement('afterend',status)}status.textContent=sum.value.length+' / 500 अक्षरे'}
 }
+let pageViewsSequence=0;
+async function showPageViews(posts){
+ const request=++pageViewsSequence;
+ const total=$('metric-pageviews'),status=$('pageviews-status'),list=$('pageviews-list'),search=$('pageviews-search');
+ total.textContent='—';list.replaceChildren();
+ search.oninput=null;
+ if(!CMS.hasToken()){status.textContent='आकडे पाहण्यासाठी Admin Login आवश्यक.';return}
+ status.textContent='Page Views लोड होत आहेत…';
+ try{
+  const response=await CMS.getPageViews();if(request!==pageViewsSequence)return;
+  if(!Array.isArray(response.counts))throw Error('Invalid response');
+  const map=new Map(response.counts.map(x=>[String(x.slug),Number(x.views)||0]));
+  total.textContent=[...map.values()].reduce((a,b)=>a+b,0).toLocaleString('en-IN');
+  const rows=posts.filter(p=>p.published!==false&&p.status!=='draft').map(p=>({p,n:map.get(String(p.slug))||0})).sort((a,b)=>b.n-a.n||String(b.p.date).localeCompare(String(a.p.date)));
+  status.textContent='';
+  function draw(){
+   list.replaceChildren();
+   const q=search.value.trim().toLowerCase();
+   for(const {p,n} of rows.filter(x=>String(x.p.title||'').toLowerCase().includes(q))){
+    const row=document.createElement('button');row.type='button';row.className='dashboard-post';
+    const name=document.createElement('strong');name.textContent=p.title;
+    const value=document.createElement('span');value.textContent=n.toLocaleString('en-IN')+' Page Views';
+    row.append(name,value);row.addEventListener('click',()=>{CMS.goto('news-panel');CMS.openPost(p.slug)});list.append(row);
+   }
+   if(!list.childNodes.length)list.textContent='बातमी उपलब्ध नाही.';
+  }
+  search.oninput=draw;draw();
+ }catch(e){if(request===pageViewsSequence)status.textContent=e.message+' • Refresh करून पुन्हा तपासा.';}
+}
 function dashboard(posts){
  const all=Array.isArray(posts)?posts:[];
+ showPageViews(all);
  $('metric-total').textContent=all.length;
  $('metric-published').textContent=all.filter(p=>p.published!==false&&p.status!=='draft').length;
  $('metric-draft').textContent=all.filter(p=>p.published===false||p.status==='draft').length;

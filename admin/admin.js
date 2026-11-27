@@ -421,7 +421,12 @@
     });
   }
   window.DalalCMS={getNews:()=>state.news.slice(),getLayout:()=>structuredClone(state.layout),getSite:()=>SITE,
-    hasToken:()=>connected(),uploadMedia:async(file,path)=>uploadPhoto(file,path),
+    hasToken:()=>connected(),getPageViews:async()=>{
+      if(!workerMode||!publishKey)throw Error('सुरक्षित Admin Key Link आवश्यक.');
+      const r=await fetch(workerURL+'/page-view-stats',{method:'POST',headers:{Authorization:'Bearer '+publishKey},cache:'no-store',referrerPolicy:'no-referrer'});
+      if(!r.ok)throw Error('Page Views सेवा उपलब्ध नाही ('+r.status+')');
+      return r.json();
+    },uploadMedia:async(file,path)=>uploadPhoto(file,path),
     loadMedia:async()=>readJSON('data/media.json'),saveMedia:async(media,sha)=>writeJSON('data/media.json',media,sha,'Update Dharashiv Today media library'),
     uploadBrand:async(file,path)=>{
       if(!file||!/image\/(png|jpeg|webp)/.test(file.type)||file.size>5*1024*1024)throw Error('लोगो PNG, JPG किंवा WebP असावा (कमाल 5 MB).');

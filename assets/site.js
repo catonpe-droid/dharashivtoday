@@ -1,5 +1,29 @@
 'use strict';
 (async()=>{
+// NEWS_PAGE_VIEWS_V1 — anonymous, article-scoped browser key; no public display.
+ const trackedViews=new Set(),pendingViews=new Set(),viewRecords=new Map();
+ function trackArticleView(slug){
+  slug=String(slug||'');
+  if(!['https://dharashivtoday.com','https://www.dharashivtoday.com'].includes(location.origin)||!/^[a-z0-9][a-z0-9_-]{2,115}$/.test(slug)||trackedViews.has(slug)||pendingViews.has(slug))return;
+  if(document.visibilityState!=='visible'){
+    const resume=()=>{if(document.visibilityState==='visible'){document.removeEventListener('visibilitychange',resume);trackArticleView(slug)}};
+    document.addEventListener('visibilitychange',resume);return;
+  }
+  const key='news-pv-v1:'+slug;
+  let record=viewRecords.get(slug);
+  try{record=JSON.parse(localStorage.getItem(key)||'null')||record}catch{}
+  if(record?.sent){trackedViews.add(slug);return}
+  if(!record?.id)record={id:crypto.randomUUID(),sent:false};
+  viewRecords.set(slug,record);
+  try{localStorage.setItem(key,JSON.stringify(record))}catch{}
+  pendingViews.add(slug);
+  fetch('https://dharashivtoday-editor.catonpe.workers.dev/page-view',{method:'POST',body:JSON.stringify({slug,reader:record.id}),headers:{'Content-Type':'text/plain'},credentials:'omit',keepalive:true,referrerPolicy:'no-referrer'}).then(r=>{
+    if(!r.ok)return;record.sent=true;trackedViews.add(slug);
+    try{localStorage.setItem(key,JSON.stringify(record))}catch{}
+  }).catch(()=>{}).finally(()=>pendingViews.delete(slug));
+ }
+
+
  const ROOT='/dharashivtoday/';
  const $=id=>document.getElementById(id);
  const esc=s=>String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[x]));
@@ -165,6 +189,7 @@
    +(p.sourceUrl&&/^https:\/\/dharashivlive\.com\//.test(p.sourceUrl)?'<div class="source-credit">स्रोत : <a href="'+esc(p.sourceUrl)+'" target="_blank" rel="noopener noreferrer">धाराशिव लाईव्ह — मूळ बातमी</a> · '+esc(dateFmt(p.date))+'</div>':'')
    +'<div class="article-after"><span>ही बातमी उपयोगी वाटली? आपल्या मित्रांपर्यंत पोहोचवा.</span>'+shareStrip+'</div>'
    +'<a class="back-to-home" href="'+ROOT+'">'+iconSvg('home')+' मुख्यपृष्ठावर परत जा</a></article>';
+  trackArticleView(p.slug);
   $('articleMount').innerHTML='<div class="article-layout">'+main+'<aside class="article-sidebar"><div class="article-sidebar-heading"><span>आणखी बातम्या</span></div>'+relatedHtml+'</aside></div>';
   $('articleMount').querySelectorAll('.copy-news-link').forEach(btn=>btn.addEventListener('click',async()=>{
    try{await navigator.clipboard.writeText(shareUrl);

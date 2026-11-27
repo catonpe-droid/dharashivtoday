@@ -36,13 +36,30 @@ async function equalSecrets(actual,expected){
   return diff===0;
 }
 
+// Persistent article counts; anonymous per-article random browser keys prevent repeat counts.
+export class NewsPageViews {
+ constructor(ctx) {
+  this.sql=ctx.storage.sql;
+  this.sql.exec("CREATE TABLE IF NOT EXISTS counts (slug TEXT PRIMARY KEY, views INTEGER NOT NULL)");
+  this.sql.exec("CREATE TABLE IF NOT EXISTS seen (slug TEXT NOT NULL, reader TEXT NOT NULL, PRIMARY KEY(slug,reader))");
+ }
+ async fetch(req) {
+  if(req.method==="POST"){
+   const {slug,reader}=await req.json();
+   this.sql.exec("INSERT OR IGNORE INTO seen(slug,reader) VALUES (?,?)",slug,reader);
+   if(this.sql.exec("SELECT changes() AS n").one().n===1)this.sql.exec("INSERT INTO counts(slug,views) VALUES (?,1) ON CONFLICT(slug) DO UPDATE SET views=views+1",slug);
+   return new Response(null,{status:204});
+  }
+  return Response.json({counts:this.sql.exec("SELECT slug,views FROM counts").toArray()});
+ }
+}
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('Origin');
     const permitted=origin&&ALLOWED_ORIGINS.has(origin);
     const cors=permitted?{
       'Access-Control-Allow-Origin':origin,
-      'Access-Control-Allow-Methods':'GET,PUT,OPTIONS',
+      'Access-Control-Allow-Methods':'GET,PUT,POST,OPTIONS',
       'Access-Control-Allow-Headers':'authorization,content-type,cache-control',
       'Access-Control-Max-Age':'600',
       'Vary':'Origin'
@@ -51,7 +68,29 @@ export default {
       return permitted?new Response(null,{status:204,headers:cors}):reply({error:'Origin not allowed'},403,cors);
     if(url.pathname==='/health'&&request.method==='GET')
       return reply({ready:!!env.GITHUB_TOKEN&&!!env.PUBLISH_KEY&&env.PUBLISH_KEY.length>=32,
-                    service:'dharashivtoday-editor',features:['news','media','layout']},200,cors);
+                    service:'dharashivtoday-editor',features:['news','media','layout','page-views'],page_views:!!env.PAGE_VIEWS},200,cors);
+    if(url.pathname==='/page-view'&&request.method==='POST'){
+      if(!permitted)return reply({error:'Origin not allowed'},403,cors);
+      if(!env.PAGE_VIEWS)return reply({error:'Page views unavailable'},503,cors);
+      try{
+        const raw=await request.text();
+        if(raw.length>260)return reply({error:'Invalid page'},400,cors);
+        const {slug,reader}=JSON.parse(raw);
+        if(typeof slug!=='string'||!/^[a-z0-9][a-z0-9_-]{2,115}$/.test(slug)||typeof reader!=='string'||!/^[a-f0-9-]{36}$/.test(reader))return reply({error:'Invalid page'},400,cors);
+        const r=await env.PAGE_VIEWS.get(env.PAGE_VIEWS.idFromName('all-articles')).fetch('https://counter.internal/',{method:'POST',body:JSON.stringify({slug,reader})});
+        return r.ok?new Response(null,{status:204,headers:{...cors,'Cache-Control':'no-store'}}):reply({error:'Page views unavailable'},503,cors);
+      }catch{return reply({error:'Page views unavailable'},503,cors)}
+    }
+    if(url.pathname==='/page-view-stats'&&request.method==='POST'){
+      if(!permitted)return reply({error:'Origin not allowed'},403,cors);
+      const auth=request.headers.get('Authorization')||'';
+      if(!env.PUBLISH_KEY||env.PUBLISH_KEY.length<32||!auth.startsWith('Bearer ')||!await equalSecrets(auth.slice(7),env.PUBLISH_KEY))return reply({error:'Invalid publishing key'},401,cors);
+      if(!env.PAGE_VIEWS)return reply({error:'Page views unavailable'},503,cors);
+      try{
+        const r=await env.PAGE_VIEWS.get(env.PAGE_VIEWS.idFromName('all-articles')).fetch('https://counter.internal/');
+        return r.ok?reply(await r.json(),200,cors):reply({error:'Page views unavailable'},503,cors);
+      }catch{return reply({error:'Page views unavailable'},503,cors)}
+    }
     if(url.pathname!=='/github'||!['GET','PUT'].includes(request.method))
       return reply({error:'Not found'},404,cors);
     if(!permitted)return reply({error:'Origin not allowed'},403,cors);
