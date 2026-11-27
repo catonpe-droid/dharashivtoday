@@ -5,6 +5,12 @@
  const esc=s=>String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[x]));
  const categories=['मुख्यपृष्ठ','ताज्या बातम्या','विशेष बातम्या','जिल्हा','क्राईम','राजकारण','शेती','विकास','शिक्षण','नोकरी','पर्यटन','क्रीडा','मनोरंजन','विशेष लेख','संपादकीय'];
  const district=['धाराशिव','तुळजापूर','कळंब','भूम','परंडा','वाशी','उमरगा','लोहारा'];
+ const categorySlugs={"मुख्यपृष्ठ":"home","ताज्या बातम्या":"latest-news","विशेष बातम्या":"featured-news","जिल्हा":"district","क्राईम":"crime","राजकारण":"politics","शेती":"agriculture","विकास":"development","शिक्षण":"education","नोकरी":"jobs","पर्यटन":"tourism","क्रीडा":"sports","मनोरंजन":"entertainment","विशेष लेख":"special-articles","संपादकीय":"editorial"};
+ const talukaSlugs={"धाराशिव":"dharashiv","तुळजापूर":"tuljapur","कळंब":"kallam","भूम":"bhoom","परंडा":"paranda","वाशी":"washi","उमरगा":"umarga","लोहारा":"lohara"};
+ const reverse=map=>Object.fromEntries(Object.entries(map).map(([label,slug])=>[slug,label]));
+ const categoryLabels=reverse(categorySlugs),talukaLabels=reverse(talukaSlugs);
+ const categoryUrl=label=>ROOT+'?category='+encodeURIComponent(Object.hasOwn(categorySlugs,label)?categorySlugs[label]:label);
+ const talukaUrl=label=>Object.hasOwn(talukaSlugs,label)?ROOT+'?taluka='+talukaSlugs[label]:ROOT+'?q='+encodeURIComponent(label);
  const CHANNEL='UCgXmATfMB5qHTrwDBlcZNpA';
  const PLAYLIST='UU'+CHANNEL.slice(2);
  let stories=[],settings={},layout={},query='';
@@ -22,8 +28,8 @@
  const inSearch=p=>!query||[p.title,p.summary,p.category,p.author,...(p.tags||[])].join(' ').toLocaleLowerCase('mr-IN').includes(query.toLocaleLowerCase('mr-IN'));
  function nav(){
   const menu=Array.isArray(layout.menu)&&layout.menu.length?layout.menu:categories;
-  $('navLinks').innerHTML=menu.map((cat,i)=>'<a data-category="'+esc(cat)+'" href="'+(i===0?ROOT:ROOT+'?category='+encodeURIComponent(cat))+'">'+(i===0?'<svg class="nav-home-icon" xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#d60012" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9"/><path d="M10 21v-7h4v7"/></svg>':esc(cat))+'</a>').join('');
-  $('listingLinks').innerHTML=menu.slice(1).map(t=>'<a href="'+ROOT+'?category='+encodeURIComponent(t)+'">'+esc(t)+'</a>').join('');
+  $('navLinks').innerHTML=menu.map((cat,i)=>'<a data-category="'+esc(cat)+'" href="'+(i===0?ROOT:categoryUrl(cat))+'">'+(i===0?'<svg class="nav-home-icon" xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#d60012" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9"/><path d="M10 21v-7h4v7"/></svg>':esc(cat))+'</a>').join('');
+  $('listingLinks').innerHTML=menu.slice(1).map(t=>'<a href="'+categoryUrl(t)+'">'+esc(t)+'</a>').join('');
  }
  function breaking(list){
   const latest=Array.isArray(list)?list:visible();
@@ -33,7 +39,7 @@
   const items=news.map((headline)=>{
    const clean=String(headline).replace(/\s+/g,' ').trim();
    const match=latest.find(p=>p.title.trim()===clean)||latest.find(p=>p.title.includes(clean)||clean.includes(p.title));
-   const destination=match?storyUrl(match):ROOT+'?category='+encodeURIComponent('ताज्या बातम्या');
+   const destination=match?storyUrl(match):categoryUrl('ताज्या बातम्या');
    const label=match?'संपूर्ण बातमी वाचा':'ताज्या बातम्या पाहा';
    return '<a class="ticker-item" href="'+destination+'" title="'+esc(clean)+'" aria-label="'+esc(clean+' — '+label)+'">'+esc(clean)+'</a>';
   }).join('');
@@ -71,7 +77,7 @@
   const specialStories=[...special,...list.filter(x=>!special.includes(x))].slice(0,3);
   $('specialList').innerHTML=specialStories.map(x=>'<a class="special-card" href="'+storyUrl(x)+'"><div class="special-story-copy"><span class="tag">'+esc(x.category||'विशेष')+'</span><h3>'+esc(x.title)+'</h3></div>'+cover(x)+'</a>').join('')||'<div class="brief-empty">विशेष बातम्या येथे प्रसिद्ध होतील.</div>';
   $('latestGrid').innerHTML=list.slice(0,6).map(card).join('')||'<div class="empty-results">Admin मधून बातम्या प्रकाशित झाल्यावर येथे दिसतील.</div>';
-  $('districtGrid').innerHTML=(settings.districts||district).map(x=>'<a href="'+ROOT+'?q='+encodeURIComponent(x)+'">'+esc(x)+' →</a>').join('');
+  $('districtGrid').innerHTML=(settings.districts||district).map(x=>'<a href="'+talukaUrl(x)+'">'+esc(x)+' →</a>').join('');
   const sectionCats=['क्राईम','राजकारण','शेती','विकास','शिक्षण','नोकरी','पर्यटन'].filter(cat=>list.some(p=>p.category===cat));
   // Use unique real stories to demonstrate the three-card layout while a section is short.
   // Supplementary stories are explicitly labeled with their actual category.
@@ -84,7 +90,7 @@
    const relevant=list.filter(p=>p.category===cat);
    const chosen=relevant.slice(0,3);
    for(const p of supplemental){if(chosen.length>=3)break;if(used.has(p.slug)||chosen.some(x=>x.slug===p.slug))continue;chosen.push(p);used.add(p.slug);}
-   const more=ROOT+'?category='+encodeURIComponent(cat);
+   const more=categoryUrl(cat);
    const rows=chosen.map((p,i)=>i===0?'<a class="topic-main" href="'+storyUrl(p)+'" title="'+esc(p.title)+'">'+cover(p)+'<strong>'+esc(p.title)+'</strong>'+'</a>':compactRow(p,p.category!==cat)).join('')+Array.from({length:Math.max(0,3-chosen.length)},placeholder).join('');
    return '<section class="topic-panel"><div class="topic-heading"><h3>'+esc(cat)+'</h3><span class="heading-line"></span><a class="view-more" href="'+more+'">View More →</a></div><div class="topic-stories">'+rows+'</div></section>';
   };
@@ -174,8 +180,12 @@
   const list=visible(),params=new URLSearchParams(location.search);
   let slug=document.documentElement.dataset.story||params.get('article')||'';
   if(!slug){const m=location.pathname.match(/\/batmi\/([a-z0-9_-]+)\/?/i);if(m)slug=m[1]}
-  query=params.get('q')||'';
-  $('searchInput').value=query;const cat=params.get('category')||'';
+  const taluka=params.get('taluka')||'';
+  query=params.get('q')||(Object.hasOwn(talukaLabels,taluka)?talukaLabels[taluka]:'');
+  const rawCat=params.get('category')||'';
+  const cat=Object.hasOwn(categoryLabels,rawCat)?categoryLabels[rawCat]:rawCat;
+  if(rawCat&&Object.hasOwn(categorySlugs,rawCat)){params.set('category',categorySlugs[rawCat]);history.replaceState(history.state,'',location.pathname+'?'+params.toString()+location.hash);}
+  $('searchInput').value=query;
   $('breadcrumb').hidden=!slug&&!cat&&!query;$('breadcrumb').innerHTML='<a href="'+ROOT+'">मुख्यपृष्ठ</a> / '+esc(cat|| (slug?'बातमी':'शोध'));
   if(slug)article(slug,list);else if(cat||query)listing(cat,list);else{
    $('homeSections').hidden=false;$('listingSections').hidden=true;$('articleSection').hidden=true;homepage(list);document.title='धाराशिव टुडे | जिल्ह्याचा आवाज... जनतेची बातमी!';
