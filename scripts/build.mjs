@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 const DEMO='https://catonpe-droid.github.io/dharashivtoday/';
-const site=(process.env.PAGES_URL||DEMO).replace(/\/+$/,'')+'/';
+// Production domain is authoritative: configure-pages can return a stale project URL after migration.
+const site='https://www.dharashivtoday.com/';
 const root=new URL(site).pathname;
 const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const adapt=s=>s.replaceAll(DEMO,'__DT_ABSOLUTE__').replaceAll('/dharashivtoday/',root).replaceAll('__DT_ABSOLUTE__',site);
