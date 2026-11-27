@@ -1,31 +1,17 @@
 'use strict';
 (async()=>{
-// NEWS_PAGE_VIEWS_V1 — anonymous, article-scoped browser key; no public display.
- const trackedViews=new Set(),pendingViews=new Set(),viewRecords=new Map();
- async function pageViewsGoogleURL(){try{const r=await fetch('/assets/pageviews-config.json',{cache:'no-store'});if(!r.ok)return '';const u=String((await r.json()).google_web_app||'');return /^https:\/\/script\.google\.com\/macros\/s\/[a-zA-Z0-9_-]+\/exec$/.test(u)?u:''}catch{return ''}}
+// Free, approximate article views; no display on public site.
+ const pvBase='https://abacus.jasoncameron.dev/',pvNamespace='dharashivtoday-news-pv-20261127';
+ async function pvKey(slug){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(String(slug)));return Array.from(new Uint8Array(b),v=>v.toString(16).padStart(2,'0')).join('');}
+ async function pvRequest(action,slug){const r=await fetch(pvBase+action+'/'+pvNamespace+'/'+await pvKey(slug),{cache:'no-store',credentials:'omit',referrerPolicy:'no-referrer',keepalive:action==='hit'});if(action==='get'&&r.status===404)return 0;if(r.status===429){const e=Error('Page Views: सेवा मर्यादा');e.rateLimited=true;throw e;}if(!r.ok)throw Error('Page Views सेवा उपलब्ध नाही');const j=await r.json();if(!Number.isSafeInteger(j.value)||j.value<0)throw Error('Page Views डेटा उपलब्ध नाही');return j.value;}
+
+ const trackedViews=new Set(),pendingViews=new Set();
  async function trackArticleView(slug){
-  slug=String(slug||'');
-  if(!['https://dharashivtoday.com','https://www.dharashivtoday.com'].includes(location.origin)||!/^[a-z0-9][a-z0-9_-]{2,115}$/.test(slug)||trackedViews.has(slug)||pendingViews.has(slug))return;
-  if(document.visibilityState!=='visible'){
-    const resume=()=>{if(document.visibilityState==='visible'){document.removeEventListener('visibilitychange',resume);trackArticleView(slug)}};
-    document.addEventListener('visibilitychange',resume);return;
-  }
-  const google=await pageViewsGoogleURL();if(pendingViews.has(slug)||trackedViews.has(slug))return;
-  const key=(google?'news-pv-google-v1:':'news-pv-v1:')+slug;
-  let record=viewRecords.get(slug);
-  try{record=JSON.parse(localStorage.getItem(key)||'null')||record}catch{}
-  if(record?.sent){trackedViews.add(slug);return}
-  if(!record?.id)record={id:crypto.randomUUID(),sent:false};
-  viewRecords.set(slug,record);
-  try{localStorage.setItem(key,JSON.stringify(record))}catch{}
-  pendingViews.add(slug);
-  fetch(google||'https://dharashivtoday-editor.catonpe.workers.dev/page-view',{method:'POST',body:JSON.stringify(google?{action:'record',site:'dharashivtoday',slug,reader:record.id}:{slug,reader:record.id}),headers:{'Content-Type':'text/plain'},credentials:'omit',keepalive:true,referrerPolicy:'no-referrer'}).then(async r=>{
-    if(!r.ok||(google&&!(await r.json()).ok))return;record.sent=true;trackedViews.add(slug);
-    try{localStorage.setItem(key,JSON.stringify(record))}catch{}
-  }).catch(()=>{}).finally(()=>pendingViews.delete(slug));
+  slug=String(slug||'');if(!['https://dharashivtoday.com','https://www.dharashivtoday.com'].includes(location.origin)||!/^[a-z0-9][a-z0-9_-]{2,115}$/.test(slug)||trackedViews.has(slug)||pendingViews.has(slug))return;
+  if(document.visibilityState!=='visible'){const resume=()=>{if(document.visibilityState==='visible'){document.removeEventListener('visibilitychange',resume);trackArticleView(slug)}};document.addEventListener('visibilitychange',resume);return;}
+  const key='free-pv-v1:'+slug;try{if(localStorage.getItem(key)){trackedViews.add(slug);return}}catch{}
+  pendingViews.add(slug);try{await pvRequest('hit',slug);trackedViews.add(slug);try{localStorage.setItem(key,'1')}catch{}}catch{}finally{pendingViews.delete(slug)}
  }
-
-
  const ROOT='/dharashivtoday/';
  const $=id=>document.getElementById(id);
  const esc=s=>String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[x]));

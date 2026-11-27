@@ -420,19 +420,22 @@
       window.DalalPro?.onTab?.(target);
     });
   }
-  async function pageViewsGoogleURL(){try{const r=await fetch('/assets/pageviews-config.json',{cache:'no-store'});if(!r.ok)return '';const u=String((await r.json()).google_web_app||'');return /^https:\/\/script\.google\.com\/macros\/s\/[a-zA-Z0-9_-]+\/exec$/.test(u)?u:''}catch{return ''}}
+  const pvBase='https://abacus.jasoncameron.dev/',pvNamespace='dharashivtoday-news-pv-20261127';
+ async function pvKey(slug){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(String(slug)));return Array.from(new Uint8Array(b),v=>v.toString(16).padStart(2,'0')).join('');}
+ async function pvRequest(action,slug){const r=await fetch(pvBase+action+'/'+pvNamespace+'/'+await pvKey(slug),{cache:'no-store',credentials:'omit',referrerPolicy:'no-referrer',keepalive:action==='hit'});if(action==='get'&&r.status===404)return 0;if(r.status===429){const e=Error('Page Views: सेवा मर्यादा');e.rateLimited=true;throw e;}if(!r.ok)throw Error('Page Views सेवा उपलब्ध नाही');const j=await r.json();if(!Number.isSafeInteger(j.value)||j.value<0)throw Error('Page Views डेटा उपलब्ध नाही');return j.value;}
+
+  let pvCache=null,pvInFlight=null,pvLastStarted=0,pvLastKey='';
+  async function loadFreePageViews(){
+    const slugs=[...new Set(state.news.filter(p=>p.published!==false&&p.status!=='draft').map(p=>String(p.slug)))].sort();
+    const key=slugs.join('|');
+    if(pvCache&&key===pvLastKey&&Date.now()-pvLastStarted<60000)return pvCache;
+    if(pvInFlight)return pvInFlight;
+    pvLastKey=key;pvLastStarted=Date.now();
+    pvInFlight=(async()=>{const counts=[];for(let i=0;i<slugs.length;i+=20){if(i)await new Promise(r=>setTimeout(r,10500));const batch=slugs.slice(i,i+20);const rows=await Promise.all(batch.map(async slug=>{try{return {slug,views:await pvRequest('get',slug)}}catch(e){if(!e.rateLimited)throw e;await new Promise(r=>setTimeout(r,11000));return {slug,views:await pvRequest('get',slug)}}}));counts.push(...rows)}pvCache={counts};return pvCache;})();
+    try{return await pvInFlight}finally{pvInFlight=null}
+  }
   window.DalalCMS={getNews:()=>state.news.slice(),getLayout:()=>structuredClone(state.layout),getSite:()=>SITE,
-    hasToken:()=>connected(),setPageViewsKey:key=>sessionStorage.setItem('news-pageviews-read-key',key),getPageViews:async()=>{
-      const google=await pageViewsGoogleURL();
-      if(google){const key=sessionStorage.getItem('news-pageviews-read-key');if(!key)throw Error('PV_KEY_REQUIRED');
-       const r=await fetch(google,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'stats',site:'dharashivtoday',key}),credentials:'omit',cache:'no-store',referrerPolicy:'no-referrer'});
-       if(!r.ok)throw Error('Page Views सेवा उपलब्ध नाही');const j=await r.json();if(j.error==='Access denied'){sessionStorage.removeItem('news-pageviews-read-key');throw Error('PV_KEY_REQUIRED')}if(!j.ok)throw Error('Page Views सेवा उपलब्ध नाही');return j;
-      }
-      if(!workerMode||!publishKey)throw Error('सुरक्षित Admin Key Link आवश्यक.');
-      const r=await fetch(workerURL+'/page-view-stats',{method:'POST',headers:{Authorization:'Bearer '+publishKey},cache:'no-store',referrerPolicy:'no-referrer'});
-      if(!r.ok)throw Error('Page Views सेवा उपलब्ध नाही ('+r.status+')');
-      return r.json();
-    },uploadMedia:async(file,path)=>uploadPhoto(file,path),
+    hasToken:()=>connected(),getPageViews:loadFreePageViews,uploadMedia:async(file,path)=>uploadPhoto(file,path),
     loadMedia:async()=>readJSON('data/media.json'),saveMedia:async(media,sha)=>writeJSON('data/media.json',media,sha,'Update Dharashiv Today media library'),
     uploadBrand:async(file,path)=>{
       if(!file||!/image\/(png|jpeg|webp)/.test(file.type)||file.size>5*1024*1024)throw Error('लोगो PNG, JPG किंवा WebP असावा (कमाल 5 MB).');
